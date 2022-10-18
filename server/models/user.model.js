@@ -27,6 +27,19 @@ const userSchema = new schema({
         required: true,
         trim: true,
     },
+    pin: {
+        type: Number,
+        trim: true,
+    },
+    accountConfirmed: {
+        type: Boolean,
+        default: false,
+    },
+    type: {
+        type: String,
+        enum: ["Active", "Inactive", "Deactivated"],
+        required: true,
+    },
     createdAt: {
         type: String,
         default: moment().format(),

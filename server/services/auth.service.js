@@ -1,7 +1,8 @@
-const { User } = require("../models")
+const { User, Token } = require("../models")
 const bcrypt = require("bcryptjs")
 const ApiError = require("../helpers/ApiError")
 const jwt = require("jsonwebtoken")
+const { tokenService } = require(".")
 
 const register = async (data) => {
     try {
@@ -25,6 +26,7 @@ const login = async (email, password) => {
     try {
         const user = await User.findOne({ email })
         if(!user) throw new ApiError(400, "invalid email or password")
+        if(!user.accountConfirmed) throw new ApiError("Account not activated")
         await comparePassword(password, user)
         return user
     } catch (error) {
@@ -44,12 +46,14 @@ const comparePassword = async (password, user) => {
 
 const getUsers = async (criteria = {}, options = {}) => {
     try {
-        const { sort = { createdAt: -1 }, limit} = options
+        const { sort = { createdAt: -1 }, limit, page } = options
         const _limit = parseInt(limit, 10)
+        const _page = parseInt(page, 10)
         const users = await User.find(criteria)
         .sort(sort)
         .limit(_limit)
-        return users
+        .skip(_limit * (_page - 1))
+        return { users, page: _page }
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error)
     }
@@ -84,7 +88,7 @@ const validateToken = function(req, res, next) {
     jwt.verify(req.token, process.env.JWT_SECRET_KEY, (err, authData) => {
         if(err){
             const errorCode = err.code || 500
-            const errorMessage = err.message || error
+            const errorMessage = err.message || err
             return res.status(errorCode).send({
                 message: `${errorMessage}`,
             })
@@ -93,6 +97,66 @@ const validateToken = function(req, res, next) {
             next();
         }
     })
+}
+
+const updateUserById = async (userId, updateBody) => {
+    try {
+        const user = await User.findById(userId)
+        if(!user) throw new ApiError(400, "User not found")
+        if(updateBody.email){
+            const check = await User.findOne({ email: updateBody.email })
+            if(check) throw new ApiError(400, "Email already taoken")
+        }
+        Object.assign(user, updateBody)
+        await user.save()
+        return user
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error);   
+    }
+}
+
+const emailVerification = async (email) => {
+    try {
+        let user = await getUserByEmail(email)
+        user = await updateUserById(user._id, { accountConfirmed: true })
+        return user
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || "An error occured");
+    }
+}
+
+const resetPassword = async (resetPasswordToken, newPassword) => {
+    try {
+        const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, "resetPassword")
+        const user = await User.findById(resetPasswordTokenDoc.user)
+        if(!user) throw new ApiError(400, "Password reset failed")
+        await Token.deleteMany({ user: user.id, type: "resetPassword" })
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+        const updateUser = await updateUserById(user.id, {
+            password: hashedPassword
+        })
+        return updateUser
+    } catch (error) {
+        throw new ApiError(
+            400,
+            (error && error.message) || "Password reset failed"
+        )
+    }
+}
+
+const updatePassword = async (email, oldPassword, newPassword) => {
+    try {
+        const user = await User.findOne({ email })
+        if(!user) throw new ApiError(400, "Invalid email or password")
+        const verifyUser = await comparePassword(oldPassword, user)
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+        await updateUserById(user.id, { password: hashedPassword })
+    } catch (error) {
+        throw new ApiError(
+            400,
+            (error && error.message) || "Password reset failed"
+          );
+    }
 }
 
 const count = async (criteria = {}) => {
@@ -106,5 +170,9 @@ module.exports = {
     getUserById,
     getUsers,
     validateToken,
+    updateUserById,
+    emailVerification,
+    resetPassword,
+    updatePassword,
     count
 }
