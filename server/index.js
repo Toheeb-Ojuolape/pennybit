@@ -5,8 +5,10 @@ const logger = require("./helpers/logger")
 const listAllRoutes = require("express-list-endpoints")
 const { errorConverter, errorHandler } = require("./helpers/error")
 const Table = require("cli-table")
-const port = process.env.PORT
 require("dotenv").config()
+
+const port = process.env.PORT
+
 require("./config/mongoose")
 
 
@@ -17,7 +19,7 @@ app.use(cors("*"))
 // Routes
 // Index page
 app.get("/", (req, res) => {
-    res.status(200).send({ 
+    res.status(200).send({
         message: "Welcome to Pent. Your go to application regarding home/house reviews. Everything you need to know, all in one click"
     })
 })

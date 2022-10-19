@@ -66,4 +66,4 @@ router.get(
   authController.getUsers
 );
 
-
+module.exports = router
