@@ -5,7 +5,12 @@ const pick = require("../helpers/pick")
 const { authService, tokenService } = require("../services")
 
 const register = catchAsync(async (req, res) => {
-    const user = await authService.register({ ...req.body, Status: "Inactive" })
+    const token = Math.floor(1000 + Math.random() * 9000)
+    var userRequest = {
+        ...req.body,
+        pin: token.toString()
+    }
+    const user = await authService.register(userRequest)
     const tokens = await tokenService.generateAuthTokens(user, true)
     // Send email
     res.status(201).send({
@@ -16,7 +21,6 @@ const register = catchAsync(async (req, res) => {
         }
     })
 })
-
 
 const login = catchAsync(async (req, res) => {
     const { email, password } = req.body
@@ -44,7 +48,7 @@ const resendTokens = catchAsync(async (req, res) => {
 
 const emailVerification = catchAsync(async (req, res) => {
     try {
-        const user = await authService.emailVerification(req.user.email)
+        const user = await authService.emailVerification(req.body)
         res.send({ 
             message: "Account activated successfully",
             user

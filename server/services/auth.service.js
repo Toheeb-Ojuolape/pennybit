@@ -26,7 +26,8 @@ const login = async (email, password) => {
     try {
         const user = await User.findOne({ email })
         if(!user) throw new ApiError(400, "invalid email or password")
-        if(!user.accountConfirmed) throw new ApiError("Account not activated")
+        if(!user.accountConfirmed) throw new ApiError(400, "Account not activated")
+        if(!user.status) throw new ApiError(400, "Your account is not activated")
         await comparePassword(password, user)
         return user
     } catch (error) {
@@ -115,10 +116,12 @@ const updateUserById = async (userId, updateBody) => {
     }
 }
 
-const emailVerification = async (email) => {
+const emailVerification = async (data) => {
     try {
-        let user = await getUserByEmail(email)
-        user = await updateUserById(user._id, { accountConfirmed: true })
+        console.log("point one")
+        let user = await User.findOne({ email: data.email, pin: data.pin })
+        if(!user) throw new ApiError(400, "Invalid user")
+        user = await updateUserById(user._id, { accountConfirmed: true, status: "Active" })
         return user
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || "An error occured");

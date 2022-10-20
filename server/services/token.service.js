@@ -18,7 +18,7 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
         const tokenDoc = await Token.create({
             token,
             user: userId,
-            expires: expires.ToDate(),
+            expires: expires.toDate(),
             type,
             blacklisted
         })
@@ -43,7 +43,7 @@ const saveUpdateToken = async (token, userId, expires, type, blacklisted = false
         const newToken = await Token.create({
             token,
             user: userId,
-            expires: expires.ToDate(),
+            expires: expires.toDate(),
             type,
             blacklisted
         })
@@ -195,7 +195,7 @@ const generateUpdateSetPasswordTokne = async (email, expires) => {
         await saveUpdateToken(setPasswordToken, user._id, expires, "resetPassword")
         return {
             token: setPasswordToken,
-            expires: expires.toDate(0)
+            expires: expires.toDate()
         }
     } catch (error) {
         const message = error.message || error

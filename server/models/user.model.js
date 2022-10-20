@@ -18,7 +18,15 @@ const userSchema = new schema({
         required: true,
         trim: true,
     },
+    pin: {
+        type: String,
+        required: true
+    },
     phoneNumber: {
+        type: String,
+        trim: true,
+    },
+    dateOfBirth: {
         type: String,
         trim: true,
     },
@@ -27,18 +35,19 @@ const userSchema = new schema({
         required: true,
         trim: true,
     },
-    pin: {
-        type: Number,
-        trim: true,
+    gender: {
+        type: String,
+        enum: ["Male", "Female", "Others"],
+        required: true,
     },
     accountConfirmed: {
         type: Boolean,
         default: false,
     },
-    type: {
+    status: {
         type: String,
         enum: ["Active", "Inactive", "Deactivated"],
-        required: true,
+        default: "Inactive"
     },
     createdAt: {
         type: String,
