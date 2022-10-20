@@ -13,6 +13,19 @@ const login = {
   })
 }
 
+const confirmAccount = {
+  body: Joi.object().keys({
+    email: Joi.string().required().messages({
+        "string.empty": `Email cannot be an empty field`,
+        "any.required": `Email is a required field`,
+    }),
+    pin: Joi.string().required().messages({
+        "string.empty": `Pin cannot be an empty field`,
+        "any.required": `Pin is a required field`,
+    })
+  })
+}
+
 const register = {
   body: Joi.object().keys({
     firstName: Joi.string().required().messages({
@@ -30,6 +43,10 @@ const register = {
     email: Joi.string().required().messages({
       "string.empty": `Email cannot be an empty field`,
       "any.required": `Email is a required field`,
+    }),
+    gender: Joi.string().required().messages({
+      "string.empty": `Gender cannot be an empty field`,
+      "any.required": `Gender is a required field`,
     })
   }),
 }
@@ -87,6 +104,7 @@ const resendMail = {
 module.exports = {
     register,
     login,
+    confirmAccount,
     forgotPassword,
     resetPassword,
     updatePassword

@@ -6,9 +6,7 @@ const listAllRoutes = require("express-list-endpoints")
 const { errorConverter, errorHandler } = require("./helpers/error")
 const Table = require("cli-table")
 require("dotenv").config()
-
 const port = process.env.PORT
-
 require("./config/mongoose")
 
 

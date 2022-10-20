@@ -12,25 +12,25 @@ router.post(
 )
 
 router.post(
-    "login",
+    "/login",
     [validate(authValidation.login)],
     authController.login
 )
 
 router.post(
-    "/account/confitrm",
-    [authService.validateToken],
+    "/verifyaccount",
+    [validate(authValidation.confirmAccount)],
     authController.emailVerification
 )
 
 router.post(
-    "forgot/password",
+    "/forgot/password",
     [validate(authValidation.forgotPassword)],
     authController.forgotPassword
 )
 
 router.post(
-    "reset/password",
+    "/reset/password",
     [validate(authValidation.resetPassword)],
     authController.resetPassword
 )
@@ -65,5 +65,6 @@ router.get(
   [authService.validateToken],
   authController.getUsers
 );
+
 
 module.exports = router
