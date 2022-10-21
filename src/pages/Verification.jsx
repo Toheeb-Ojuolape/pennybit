@@ -1,7 +1,7 @@
 import React from "react";
 import Image01 from "../assets/svg/logo.svg";
 
-const ConfirmEmail = () => {
+const Verification = () => {
   return (
     <div className="bg-background h-screen flex justify-center items-center w-full">
       <div className="w-[35%] py-10">
@@ -11,7 +11,7 @@ const ConfirmEmail = () => {
         <div className="bg-white py-10 px-16 rounded-3xl ">
           <div className="pb-10">
             <p className="text-3xl text-center font-sans pb-1">
-              Confirm your email address
+              Verification Code sent
             </p>
             <p className="text-sm text-center">
               We’ve sent an OTP to your email. Kindly enter it below to confirm
@@ -34,4 +34,4 @@ const ConfirmEmail = () => {
   );
 };
 
-export default ConfirmEmail;
+export default Verification;

@@ -15,7 +15,7 @@ const Register = () => {
 
         <div className="bg-white p-10 rounded-3xl">
           <div className="mb-3">
-            <p className="font-sans text-3xl text-center">
+            <p className="font-sans text-3xl text-center pb-1">
               Open an <span className="text-orange">account</span>
             </p>
             <p className="text-center text-xs text-black">
@@ -133,7 +133,7 @@ const Register = () => {
           </form>
           <div className="flex justify-center pt-3 text-base gap-1">
             <p>Already have an account?</p>
-            <p className="text-orange cursor-pointer">Login</p>
+            <p className="text-orange cursor-pointer font-bold">Login</p>
           </div>
         </div>
       </div>
