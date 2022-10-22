@@ -15,7 +15,7 @@ const ConfirmOTP = ({ title }) => {
           isNumberInput
           length={5}
           className="my-[1.46rem] flex items-center  justify-center"
-          inputClassName="border-2 text-[0.78125rem] font-normal outline-none text-center w-[1.7335rem]  md:w-[3.3335rem] text-2xl md:text-4xl mr-[0.83rem]"
+          inputClassName="border-2 text-[0.78125rem] md:py-2 font-normal outline-none text-center w-[1.7335rem]  md:w-[3.3335rem] text-2xl md:text-4xl mr-[0.83rem]"
           onChangeOTP={(otp) => setOtp(otp)}
         />
       </div>
