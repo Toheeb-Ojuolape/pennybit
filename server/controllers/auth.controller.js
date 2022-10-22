@@ -58,6 +58,7 @@ const resendTokens = catchAsync(async (req, res) => {
 const emailVerification = catchAsync(async (req, res) => {
     try {
         const user = await authService.emailVerification(req.body)
+        delete user.password
         res.send({
             message: "Account activated successfully",
             user
