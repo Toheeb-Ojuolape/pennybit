@@ -1,41 +1,53 @@
 import React, { useState } from "react";
-import Image01 from "../assets/svg/logo.svg";
 import Image02 from "../assets/image/Vector.jpg";
-import { BsFillEyeSlashFill, BsFillEyeFill, BsCalendar } from "react-icons/bs";
+import Imag02 from "../assets/image/49.png";
+import Imag03 from "../assets/image/108.png";
+import { BsCalendar } from "react-icons/bs";
+import Button from "../components/Button";
+import { Link, useNavigate } from "react-router-dom";
+import InputField from "../components/InputField";
+import TextField from "@mui/material/TextField";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DesktopDatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { Formik } from "formik";
+import dayjs from "dayjs";
+import AuthScreen from "../HOC/AuthScreen";
+import Gender from "./Gender";
 
 const Register = () => {
-  const [password, setPassword] = useState(false);
+  const [password, setPassword] = useState(true);
   const [youngster, setYoungster] = useState(true);
+  const [date, setDate] = useState(dayjs("2014-08-18T21:11:54"));
+  const [selectGender, setSelectGender] = useState(false);
+  const navigate = useNavigate();
+  const [selected, setSelected] = useState(null);
+
+  const handleChangedate = (value) => {
+    setDate(value);
+  };
+
   return (
-    <div className="bg-background h-full flex justify-center items-center w-full">
-      <div className="w-[35%] py-10">
-        <div className="flex justify-center pb-5">
-          <img src={Image01} alt="" />
-        </div>
-
-        <div className="bg-white p-10 rounded-3xl">
-          <div className="mb-3">
-            <p className="font-sans text-3xl text-center pb-1">
-              Open an <span className="text-orange">account</span>
-            </p>
-            <p className="text-center text-xs text-black">
-              Endless financial possibilities for young people
-            </p>
-          </div>
-
-          <div className="flex justify-between text-[10px] pb-3">
-            <button
-              className={`w-[50%] ${
-                youngster && "bg-background border-b-2 border-orange py-2"
-              }`}
-              onClick={() => setYoungster(true)}
-            >
+    <AuthScreen
+      title={
+        !selectGender ? (
+          <>
+            Open an <span className="text-orange">account</span>
+          </>
+        ) : (
+          "Choose your gender:"
+        )
+      }
+      subtitle={selectGender ? "" : "Endless financial possibilities for young people"}
+    >
+      {!selectGender ? (
+        <>
+          <div className="flex justify-between text-[14px] pb-3">
+            <button className={`font-bold w-[50%] ${youngster && "bg-background border-b-2 border-orange py-2"}`} onClick={() => setYoungster(true)}>
               As a Youngster
             </button>
             <button
-              className={`w-[50%] ${
-                !youngster && "bg-background border-b-2 border-orange py-2"
-              }`}
+              className={`font-bold w-[50%] ${!youngster && "bg-background border-b-2 border-orange py-2"}`}
               onClick={() => setYoungster(false)}
             >
               As a Parent
@@ -46,98 +58,91 @@ const Register = () => {
             <div className="flex items-center gap-3 pb-5">
               <img src={Image02} alt="" />
               <p className="text-[10px]">
-                As a parent, you can create a custodian account for your kid on
-                Pennybit.
+                As a parent, you can create a custodian account for your kid on Pennybit.
                 <br /> To learn more about custodian accounts, click here
               </p>
             </div>
           )}
-
-          <form action="">
-            <div className="pb-3">
-              <p className="text-xs pb-1 text-black font-medium">First Name</p>
-              <input
-                type="text"
-                placeholder="What is your first name?"
-                className="w-full border-2 rounded-2xl p-2 border-[#ADADAD] placeholder-[#877F7F] focus:outline-none"
-              />
-            </div>
-            <div className="pb-3">
-              <p className="text-xs pb-1 text-black font-medium">Last Name</p>
-              <input
-                type="text"
-                placeholder="What is your last name?"
-                className="w-full border-2 rounded-2xl p-2 border-[#ADADAD] placeholder-[#877F7F] focus:outline-none"
-              />
-            </div>
-            <div className="pb-3">
-              <p className="text-xs pb-1 text-black font-medium">
-                Email Address
-              </p>
-              <input
-                type="text"
-                placeholder="What is your email address"
-                className="w-full border-2 rounded-2xl p-2 border-[#ADADAD] placeholder-[#877F7F] focus:outline-none"
-              />
-            </div>
-            <div className="pb-3">
-              <p className="text-xs pb-1 text-black font-medium">
-                Phone Number
-              </p>
-              <input
-                type="text"
-                placeholder="Tell us your phone number"
-                className="w-full border-2 rounded-2xl p-2 border-[#ADADAD] placeholder-[#877F7F] focus:outline-none"
-              />
-            </div>
-            {youngster && (
-              <div className="pb-3">
-                <p className="text-xs pb-1 text-black font-medium">
-                  Date of Birth
-                </p>
-                <div className="flex justify--between items-center w-full border-2 rounded-2xl p-2 border-[#ADADAD]">
-                  <input
-                    type="text"
-                    placeholder="25-12-1998"
-                    className="w-full placeholder-[#877F7F] focus:outline-none"
+          <div>
+            <Formik onSubmit={() => null} initialValues={{}} enableReinitialize validationSchema={""}>
+              {({ handleSubmit, setFieldValue }) => (
+                <>
+                  <InputField label="First Name" placeholder="What is your first name?" name="firstName" />
+                  <InputField label="Last Name" placeholder="What is your last name?" name="lastName" />
+                  <InputField label="Email Address" placeholder="What is your email address" name="email" />
+                  <InputField label="Phone Number" placeholder="Tell us your phone number" name="phone" />
+                  {youngster && (
+                    <div className="py-2 relative flex w-full border-[#ADADAD] placeholder-[#877F7F] flex-col">
+                      <label className="text-xs text-black font-medium mb-1">Date of Birth</label>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DesktopDatePicker
+                          components={{ OpenPickerIcon: () => <BsCalendar className="cursor-pointer text-xl" /> }}
+                          className="w-full focus:outline-none"
+                          inputFormat="DD-MM-YYYY"
+                          disableMaskedInput={true}
+                          value={date}
+                          onChange={handleChangedate}
+                          renderInput={(params) => (
+                            <TextField
+                              focused={false}
+                              {...params}
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  "& > fieldset": { borderColor: "#ADADAD", borderRadius: "1rem", borderWidth: "2px" },
+                                  "&:hover fieldset": {
+                                    borderColor: "grey",
+                                  },
+                                },
+                                "& .MuiOutlinedInput-root:hover": {
+                                  "& > fieldset": {
+                                    borderColor: "#ADADAD",
+                                  },
+                                },
+                              }}
+                              inputProps={{
+                                ...params.inputProps,
+                                style: {
+                                  padding: 10,
+                                },
+                                placeholder: "25-12-1998",
+                              }}
+                            />
+                          )}
+                        />
+                      </LocalizationProvider>
+                    </div>
+                  )}
+                  <InputField
+                    label="Password"
+                    placeholder="This will be our secret"
+                    isPassword
+                    password={password}
+                    setPassword={setPassword}
+                    name="password"
                   />
-                  <BsCalendar className="cursor-pointer text-2xl" />
-                </div>
-              </div>
-            )}
-            <div className="pb-3">
-              <p className="text-xs pb-1 text-black font-medium">Password</p>
-              <div className="flex justify--between items-center w-full border-2 rounded-2xl p-2 border-[#ADADAD]">
-                <input
-                  type={password ? "password" : "text"}
-                  placeholder="This will be our secret"
-                  className="w-full placeholder-[#877F7F] focus:outline-none"
-                />
-                {password ? (
-                  <BsFillEyeFill
-                    className="cursor-pointer text-2xl"
-                    onClick={() => setPassword(false)}
-                  />
-                ) : (
-                  <BsFillEyeSlashFill
-                    className="cursor-pointer text-2xl"
-                    onClick={() => setPassword(true)}
-                  />
-                )}
-              </div>
-            </div>
-
-            <button className="p-5 rounded-full text-white bg-orange w-full text-lg hover:border-2 hover:border-orange hover:text-orange hover:bg-transparent">
-              Create Account
-            </button>
-          </form>
-          <div className="flex justify-center pt-3 text-base gap-1">
-            <p>Already have an account?</p>
-            <p className="text-orange cursor-pointer font-bold">Login</p>
+                  <Button content={"Create Account"} onClick={() => (!youngster ? setSelectGender(true) : navigate("/verification"))} />
+                </>
+              )}
+            </Formik>
           </div>
+
+          <div className="flex flex-col md:flex-row items-center justify-center pt-3 text-base gap-1">
+            <p>Already have an account?</p>
+            <Link to="/" className="text-orange cursor-pointer font-bold">
+              Login
+            </Link>
+          </div>
+        </>
+      ) : (
+        <div className="py-6">
+          <div className="flex justify-center items-center gap-16 pb-12">
+            <Gender name="Babe" img={Imag02} selected={selected} setSelected={setSelected} />
+            <Gender name="bro" img={Imag03} selected={selected} setSelected={setSelected} />
+          </div>
+          <Button content={"Continue"} onClick={() => navigate("/verification")} />
         </div>
-      </div>
-    </div>
+      )}
+    </AuthScreen>
   );
 };
 
