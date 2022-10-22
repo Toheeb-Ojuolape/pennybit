@@ -18,7 +18,7 @@ app.use(cors("*"))
 // Index page
 app.get("/", (req, res) => {
     res.status(200).send({
-        message: "Welcome to Pent. Your go to application regarding home/house reviews. Everything you need to know, all in one click"
+        message: "Welcome to Pennybit"
     })
 })
 // Routes

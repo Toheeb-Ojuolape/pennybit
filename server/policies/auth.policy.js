@@ -3,12 +3,12 @@ const Joi = require("joi")
 const login = {
   body: Joi.object().keys({
     email: Joi.string().required().messages({
-        "string.empty": `Email cannot be an empty field`,
-        "any.required": `Email is a required field`,
+      "string.empty": `Email cannot be an empty field`,
+      "any.required": `Email is a required field`,
     }),
     password: Joi.string().required().messages({
-        "string.empty": `Password cannot be an empty field`,
-        "any.required": `Password is a required field`,
+      "string.empty": `Password cannot be an empty field`,
+      "any.required": `Password is a required field`,
     })
   })
 }
@@ -16,12 +16,12 @@ const login = {
 const confirmAccount = {
   body: Joi.object().keys({
     email: Joi.string().required().messages({
-        "string.empty": `Email cannot be an empty field`,
-        "any.required": `Email is a required field`,
+      "string.empty": `Email cannot be an empty field`,
+      "any.required": `Email is a required field`,
     }),
     pin: Joi.string().required().messages({
-        "string.empty": `Pin cannot be an empty field`,
-        "any.required": `Pin is a required field`,
+      "string.empty": `Pin cannot be an empty field`,
+      "any.required": `Pin is a required field`,
     })
   })
 }
@@ -47,6 +47,13 @@ const register = {
     gender: Joi.string().required().messages({
       "string.empty": `Gender cannot be an empty field`,
       "any.required": `Gender is a required field`,
+    }),
+    phoneNumber: Joi.string().required().messages({
+      "string.empty": `phoneNumber cannot be an empty field`,
+      "any.required": `phoneNumber is a required field`,
+    }),
+    dateOfBirth: Joi.string().messages({
+      "string": ``,
     })
   }),
 }
@@ -102,10 +109,10 @@ const resendMail = {
 }
 
 module.exports = {
-    register,
-    login,
-    confirmAccount,
-    forgotPassword,
-    resetPassword,
-    updatePassword
+  register,
+  login,
+  confirmAccount,
+  forgotPassword,
+  resetPassword,
+  updatePassword
 }

@@ -1,6 +1,7 @@
 const ApiError = require("../helpers/ApiError")
 const catchAsync = require("../helpers/catchAsync")
 const pick = require("../helpers/pick")
+const sendMail = require("../helpers/mail")
 
 const { authService, tokenService } = require("../services")
 
@@ -12,7 +13,15 @@ const register = catchAsync(async (req, res) => {
     }
     const user = await authService.register(userRequest)
     const tokens = await tokenService.generateAuthTokens(user, true)
-    // Send email
+    const template = "/templates/views/verification-code.html"
+    const subject = "Verify Your PennyBit Account"
+    const to = req.body.email
+    const data = {
+        "name": req.body.firstName,
+        "token": token
+    }
+    sendMail(to, template, subject, data)
+    delete user.password
     res.status(201).send({
         message: "Youngster registration was successful",
         data: {
@@ -49,7 +58,7 @@ const resendTokens = catchAsync(async (req, res) => {
 const emailVerification = catchAsync(async (req, res) => {
     try {
         const user = await authService.emailVerification(req.body)
-        res.send({ 
+        res.send({
             message: "Account activated successfully",
             user
         })
@@ -87,7 +96,7 @@ const updatePassword = catchAsync(async (req, res) => {
 })
 
 const updateUserById = catchAsync(async (req, res) => {
-    if(req.body.password) throw new ApiError("You can't update your password here")
+    if (req.body.password) throw new ApiError("You can't update your password here")
     const user = await authService.updateUserById(req.user._id, req.body)
     res.status(201).send({
         message: "User updated successfully",
@@ -97,7 +106,7 @@ const updateUserById = catchAsync(async (req, res) => {
 
 const getUser = catchAsync(async (req, res) => {
     let user;
-    if(req.query.user){
+    if (req.query.user) {
         user = JSON.parse(JSON.stringify(await authService.getUserById(req.query.user)))
     } else {
         user = JSON.parse(JSON.stringify(await authService.getUserById(req.user._id)))
