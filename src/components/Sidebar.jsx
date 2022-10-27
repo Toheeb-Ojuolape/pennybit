@@ -26,7 +26,7 @@ const Sidebar = () => {
             <div
               className={`flex items-center text-black text-lg mb-7 font-semibold px-5 cursor-pointer py-3 ${
                 location.pathname === "/dashboard" &&
-                "text-center rounded-lg text-black flex-purple bg-orange !text-white"
+                "text-center rounded-lg flex-purple bg-orange !text-white"
               }`}
             >
               <MdDashboard className="text-3xl mr-7" />
@@ -37,7 +37,7 @@ const Sidebar = () => {
             <div
               className={`flex items-center text-black text-lg mb-7 font-semibold px-5 cursor-pointer py-3  ${
                 location.pathname === "/wallet" &&
-                "text-center rounded-lg text-black flex-purple bg-white"
+                "text-center rounded-lg !text-white flex-purple bg-orange"
               }`}
             >
               <BiWallet className="text-3xl mr-7" />
@@ -48,7 +48,7 @@ const Sidebar = () => {
             <div
               className={`flex items-center text-black text-lg mb-7 font-semibold px-5 cursor-pointer py-3  ${
                 location.pathname === "/exchange" &&
-                "text-center rounded-lg text-black flex-purple bg-white"
+                "text-center rounded-lg !text-white flex-purple bg-orange"
               }`}
             >
               <BiTransfer className="text-3xl mr-7" />
@@ -59,7 +59,7 @@ const Sidebar = () => {
             <div
               className={`flex items-center text-black text-lg mb-7 font-semibold px-5 cursor-pointer py-3  ${
                 location.pathname === "/learn" &&
-                "text-center rounded-lg text-black flex-purple bg-white"
+                "text-center rounded-lg !text-white flex-purple bg-orange"
               }`}
             >
               <MdOndemandVideo className="text-3xl mr-7" />
@@ -70,7 +70,7 @@ const Sidebar = () => {
             <div
               className={`flex items-center text-black text-lg mb-7 font-semibold px-5 cursor-pointer py-3  ${
                 location.pathname === "/play" &&
-                "text-black text-center rounded-lg text-black flex-purple bg-white"
+                "text-black text-center rounded-lg !text-white flex-purple bg-orange"
               }`}
             >
               <BsFillNodePlusFill className="text-3xl mr-7" />
@@ -81,7 +81,7 @@ const Sidebar = () => {
             <div
               className={`flex items-center text-black text-lg mb-7 font-semibold px-5 cursor-pointer py-3  ${
                 location.pathname === "/account" &&
-                "text-center rounded-lg text-black flex-purple bg-white"
+                "text-center rounded-lg !text-white flex-purple bg-orange"
               }`}
             >
               <MdOutlineAccountCircle className="text-3xl mr-7" />
