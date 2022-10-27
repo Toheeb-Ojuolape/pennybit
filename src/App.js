@@ -14,6 +14,10 @@ import Exchange from "./pages/Exchange";
 import Learn from "./pages/Learn";
 import Play from "./pages/Play";
 import Account from "./pages/Account";
+import VirtualCard from "./pages/VirtualCard";
+import BitcoinAirtime from "./pages/BitcoinAirtime";
+import GeneratePayment from "./pages/GeneratePayment";
+import PaymentLink from "./pages/PaymentLink";
 
 const App = () => {
   return (
@@ -27,6 +31,10 @@ const App = () => {
         <Route path="/learn" element={<Learn />} />
         <Route path="/play" element={<Play />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/card" element={<VirtualCard />} />
+        <Route path="/bitcoinairtime" element={<BitcoinAirtime />} />
+        <Route path="/generatepayment" element={<GeneratePayment />} />
+        <Route path="/paymentlink" element={<PaymentLink />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<NewPassword />} />
         <Route path="/gender" element={<Gender />} />

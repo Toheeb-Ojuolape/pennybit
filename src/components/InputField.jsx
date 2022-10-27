@@ -2,7 +2,14 @@ import { Field } from "formik";
 import React from "react";
 import { BsFillEyeFill, BsFillEyeSlashFill } from "react-icons/bs";
 
-const InputField = ({ label, placeholder, isPassword, password, setPassword, name }) => {
+const InputField = ({
+  label,
+  placeholder,
+  isPassword,
+  password,
+  setPassword,
+  name,
+}) => {
   return (
     <div className="py-2 relative">
       <label className="text-xs text-black font-medium">{label}</label>
@@ -14,9 +21,15 @@ const InputField = ({ label, placeholder, isPassword, password, setPassword, nam
       />
       {isPassword &&
         (password ? (
-          <BsFillEyeFill className="cursor-pointer absolute top-1/2 right-4 text-gray-500 text-2xl" onClick={() => setPassword(false)} />
+          <BsFillEyeFill
+            className="cursor-pointer absolute top-1/2 right-4 text-gray-500 text-2xl"
+            onClick={() => setPassword(false)}
+          />
         ) : (
-          <BsFillEyeSlashFill className="cursor-pointer absolute text-2xl top-1/2 text-gray-500 right-4" onClick={() => setPassword(true)} />
+          <BsFillEyeSlashFill
+            className="cursor-pointer absolute text-2xl top-1/2 text-gray-500 right-4"
+            onClick={() => setPassword(true)}
+          />
         ))}
     </div>
   );

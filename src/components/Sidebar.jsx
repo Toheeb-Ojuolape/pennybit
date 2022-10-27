@@ -25,7 +25,10 @@ const Sidebar = () => {
           <Link to="/dashboard">
             <div
               className={`flex items-center text-black text-lg mb-7 font-semibold px-5 cursor-pointer py-3 ${
-                location.pathname === "/dashboard" &&
+                (location.pathname === "/dashboard" ||
+                  location.pathname === "/card" ||
+                  location.pathname === "/bitcoinairtime" ||
+                  location.pathname === "/paymentlink") &&
                 "text-center rounded-lg flex-purple bg-orange !text-white"
               }`}
             >
