@@ -7,7 +7,7 @@ const { tokenService } = require(".")
 const register = async (data) => {
     try {
         let user = await User.findOne({ email: data.email })
-        if(user){
+        if (user) {
             const err = {
                 code: 400,
                 message: "A youngster with this email already exist"
@@ -25,9 +25,9 @@ const register = async (data) => {
 const login = async (email, password) => {
     try {
         const user = await User.findOne({ email })
-        if(!user) throw new ApiError(400, "invalid email or password")
-        if(!user.accountConfirmed) throw new ApiError(400, "Account not activated")
-        if(!user.status) throw new ApiError(400, "Your account is not activated")
+        if (!user) throw new ApiError(400, "invalid email or password")
+        if (!user.accountConfirmed) throw new ApiError(400, "Account not activated")
+        if (!user.status) throw new ApiError(400, "Your account is not activated")
         await comparePassword(password, user)
         return user
     } catch (error) {
@@ -38,7 +38,7 @@ const login = async (email, password) => {
 const comparePassword = async (password, user) => {
     try {
         const result = await bcrypt.compare(password, user.password)
-        if(!result) throw new ApiError(400, "Invalid email or password")
+        if (!result) throw new ApiError(400, "Invalid email or password")
         return result
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error)
@@ -51,9 +51,9 @@ const getUsers = async (criteria = {}, options = {}) => {
         const _limit = parseInt(limit, 10)
         const _page = parseInt(page, 10)
         const users = await User.find(criteria)
-        .sort(sort)
-        .limit(_limit)
-        .skip(_limit * (_page - 1))
+            .sort(sort)
+            .limit(_limit)
+            .skip(_limit * (_page - 1))
         return { users, page: _page }
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error)
@@ -63,7 +63,7 @@ const getUsers = async (criteria = {}, options = {}) => {
 const getUserByEmail = async (email) => {
     try {
         const user = await User.findOne({ email })
-        if(!user) throw new ApiError(400, "Invalid user")
+        if (!user) throw new ApiError(400, "Invalid user")
         return JSON.parse(JSON.stringify(user))
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error);
@@ -73,21 +73,21 @@ const getUserByEmail = async (email) => {
 const getUserById = async (_id) => {
     try {
         const user = await User.findOne({ _id })
-        if(!user) throw new ApiError(400, "Invalid user")
+        if (!user) throw new ApiError(400, "Invalid user")
         return JSON.parse(JSON.stringify(user))
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error);
     }
 }
 
-const validateToken = function(req, res, next) {
+const validateToken = function (req, res, next) {
     const bearerHeader = req.headers.authorization
-    if(!bearerHeader) throw new ApiError(400, "You need to attach a token")
+    if (!bearerHeader) throw new ApiError(400, "You need to attach a token")
     const bearer = bearerHeader.split(" ")
     const [, token] = bearer
     req.token = token
     jwt.verify(req.token, process.env.JWT_SECRET_KEY, (err, authData) => {
-        if(err){
+        if (err) {
             const errorCode = err.code || 500
             const errorMessage = err.message || err
             return res.status(errorCode).send({
@@ -103,16 +103,16 @@ const validateToken = function(req, res, next) {
 const updateUserById = async (userId, updateBody) => {
     try {
         const user = await User.findById(userId)
-        if(!user) throw new ApiError(400, "User not found")
-        if(updateBody.email){
+        if (!user) throw new ApiError(400, "User not found")
+        if (updateBody.email) {
             const check = await User.findOne({ email: updateBody.email })
-            if(check) throw new ApiError(400, "Email already taoken")
+            if (check) throw new ApiError(400, "Email already taoken")
         }
         Object.assign(user, updateBody)
         await user.save()
         return user
     } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error);   
+        throw new ApiError(error.code || 500, error.message || error);
     }
 }
 
@@ -120,7 +120,7 @@ const emailVerification = async (data) => {
     try {
         console.log("point one")
         let user = await User.findOne({ email: data.email, pin: data.pin })
-        if(!user) throw new ApiError(400, "Invalid user")
+        if (!user) throw new ApiError(400, "Invalid user")
         user = await updateUserById(user._id, { accountConfirmed: true, status: "Active" })
         return user
     } catch (error) {
@@ -131,8 +131,9 @@ const emailVerification = async (data) => {
 const resetPassword = async (resetPasswordToken, newPassword) => {
     try {
         const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, "resetPassword")
+        console.log(resetPasswordTokenDoc)
         const user = await User.findById(resetPasswordTokenDoc.user)
-        if(!user) throw new ApiError(400, "Password reset failed")
+        if (!user) throw new ApiError(400, "Password reset failed")
         await Token.deleteMany({ user: user.id, type: "resetPassword" })
         const hashedPassword = await bcrypt.hash(newPassword, 10)
         const updateUser = await updateUserById(user.id, {
@@ -140,6 +141,7 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
         })
         return updateUser
     } catch (error) {
+        console.log(error)
         throw new ApiError(
             400,
             (error && error.message) || "Password reset failed"
@@ -150,7 +152,7 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
 const updatePassword = async (email, oldPassword, newPassword) => {
     try {
         const user = await User.findOne({ email })
-        if(!user) throw new ApiError(400, "Invalid email or password")
+        if (!user) throw new ApiError(400, "Invalid email or password")
         const verifyUser = await comparePassword(oldPassword, user)
         const hashedPassword = await bcrypt.hash(newPassword, 10)
         await updateUserById(user.id, { password: hashedPassword })
@@ -158,7 +160,7 @@ const updatePassword = async (email, oldPassword, newPassword) => {
         throw new ApiError(
             400,
             (error && error.message) || "Password reset failed"
-          );
+        );
     }
 }
 

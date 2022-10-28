@@ -5,6 +5,8 @@ const sendMail = require("../helpers/mail")
 
 const { authService, tokenService } = require("../services")
 
+require("dotenv").config()
+
 const register = catchAsync(async (req, res) => {
     const token = Math.floor(1000 + Math.random() * 9000)
     var userRequest = {
@@ -21,7 +23,6 @@ const register = catchAsync(async (req, res) => {
         "token": token
     }
     sendMail(to, template, subject, data)
-    delete user.password
     res.status(201).send({
         message: "Youngster registration was successful",
         data: {
@@ -71,9 +72,18 @@ const emailVerification = catchAsync(async (req, res) => {
 })
 
 const forgotPassword = catchAsync(async (req, res) => {
-    const user = JSON.parse(JSON.stringify(await authService.getUserByEmail(req.body.emai)))
-    const resetPasswordToken = await tokenService.generateResetPasswordToken(user.emai)
-    // send email
+    const user = JSON.parse(JSON.stringify(await authService.getUserByEmail(req.body.email)))
+    const resetPasswordToken = await tokenService.generateResetPasswordToken(user.email)
+    const template = "/templates/views/forgot-password.html"
+    const subject = "Password Reset Request"
+    const frontendUrl = process.env.FRONTEND_URL
+    const resetUrl = frontendUrl + "reset-password/" + resetPasswordToken
+    const to = user.email
+    const data = {
+        "name": user.firstName,
+        "url": resetUrl
+    }
+    sendMail(to, template, subject, data)
     res.status(201).send({
         message: "Please check your mail",
         data: {}
@@ -81,7 +91,9 @@ const forgotPassword = catchAsync(async (req, res) => {
 })
 
 const resetPassword = catchAsync(async (req, res) => {
-    await authService.resetPassword(req.body.resetToken, req.body.password)
+    const resetPasswordToken = req.body.resetToken
+    const newPassword = req.body.password
+    await authService.resetPassword(resetPasswordToken, newPassword)
     res.status(204).send({
         message: "password reset successfully",
         data: {}
