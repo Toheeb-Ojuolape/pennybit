@@ -58,6 +58,23 @@ const register = {
   }),
 }
 
+const updateUser = {
+  body: Joi.object().keys({
+    firstName: Joi.string().required().messages({
+      "string.empty": `First Name cannot be an empty field`,
+      "any.required": `First Name is a required field`,
+    }),
+    lastName: Joi.string().required().messages({
+      "string.empty": `Last Name cannot be an empty field`,
+      "any.required": `Last Name is a required field`,
+    }),
+    phoneNumber: Joi.string().required().messages({
+      "string.empty": `phoneNumber cannot be an empty field`,
+      "any.required": `phoneNumber is a required field`,
+    })
+  })
+}
+
 const forgotPassword = {
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
@@ -116,5 +133,7 @@ module.exports = {
   confirmAccount,
   forgotPassword,
   resetPassword,
-  updatePassword
+  updatePassword,
+  resendMail,
+  updateUser
 }
