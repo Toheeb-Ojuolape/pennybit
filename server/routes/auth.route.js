@@ -36,14 +36,14 @@ router.post(
 )
 
 router.put(
-    "update/password",
+    "/update/password",
     [validate(authValidation.updatePassword), authService.validateToken],
     authController.updatePassword
 )
 
-router.put(
-    "update/user",
-    [authService.validateToken],
+router.post(
+    "/update",
+    [validate(authValidation.updateUser), authService.validateToken],
     authController.updateUserById
 )
 

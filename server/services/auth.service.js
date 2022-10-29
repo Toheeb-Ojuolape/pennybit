@@ -105,7 +105,7 @@ const updateUserById = async (userId, updateBody) => {
         const user = await User.findById(userId)
         if (!user) throw new ApiError(400, "User not found")
         if (updateBody.email) {
-            const check = await User.findOne({ email: updateBody.email })
+            const check = await User.findById(userId)
             if (check) throw new ApiError(400, "Email already taoken")
         }
         Object.assign(user, updateBody)

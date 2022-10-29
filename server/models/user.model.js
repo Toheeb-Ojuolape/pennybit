@@ -35,6 +35,9 @@ const userSchema = new schema({
         required: true,
         trim: true,
     },
+    availableBalance: {
+        type: Number
+    },
     gender: {
         type: String,
         enum: ["Male", "Female", "Others"],
