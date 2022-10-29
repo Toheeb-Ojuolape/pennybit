@@ -57,7 +57,9 @@ const saveUpdateToken = async (token, userId, expires, type, blacklisted = false
 
 const verifyToken = async (token, type) => {
     try {
+        console.log("second")
         const payload = jwt.verify(token, process.env.JWT_SECRET_KEY)
+        console.log(payload)
         const tokenDoc = await Token.findOne({
             token,
             type,

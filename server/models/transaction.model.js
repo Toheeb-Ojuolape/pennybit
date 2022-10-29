@@ -8,7 +8,7 @@ var transactionSchema = new schema({
         required: true
     },
     user: {
-        type: Schema.Types.ObjectId,
+        type: schema.Types.ObjectId,
         ref: "User",
         required: true
     },

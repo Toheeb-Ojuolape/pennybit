@@ -36,7 +36,7 @@ const login = catchAsync(async (req, res) => {
     const { email, password } = req.body
     const user = await authService.login(email, password)
     const token = await tokenService.generateAuthTokens(user)
-    res.status(200).send({
+    res.status(201).send({
         message: "Login was successful",
         data: {
             user,
@@ -91,10 +91,8 @@ const forgotPassword = catchAsync(async (req, res) => {
 })
 
 const resetPassword = catchAsync(async (req, res) => {
-    const resetPasswordToken = req.body.resetToken
-    const newPassword = req.body.password
-    await authService.resetPassword(resetPasswordToken, newPassword)
-    res.status(204).send({
+    await authService.resetPassword(req.body, req.user.email)
+    res.status(201).send({
         message: "password reset successfully",
         data: {}
     })
