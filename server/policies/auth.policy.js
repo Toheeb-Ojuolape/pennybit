@@ -70,16 +70,18 @@ const forgotPassword = {
 
 const resetPassword = {
   body: Joi.object().keys({
-    password: Joi.string().min(8).max(20).required().messages({
-      "string.empty": `Password cannot be an empty field`,
-      "string.min": `Password should have a minimum length of {#limit}`,
-      "string.max": `Password should have a maximum length of {#limit}`,
-      "any.required": `Password is a required field`,
+    oldPassword: Joi.string().required().messages({
+      "string.empty": `oldPassword cannot be an empty field`,
+      "string.min": `Old Password should have a minimum length of {#limit}`,
+      "string.max": `Old Password should have a maximum length of {#limit}`,
+      "any.required": `oldPassword is a required field`,
     }),
-    resetToken: Joi.string().required().messages({
-      "string.empty": `Token cannot be an empty field`,
-      "any.required": `Token is a required field`,
-    }),
+    newPassword: Joi.string().min(8).max(20).required().messages({
+      "string.empty": `newPassword cannot be an empty field`,
+      "string.min": `New Password should have a minimum length of {#limit}`,
+      "string.max": `New Password should have a maximum length of {#limit}`,
+      "any.required": `newPassword is a required field`,
+    })
   }),
 }
 

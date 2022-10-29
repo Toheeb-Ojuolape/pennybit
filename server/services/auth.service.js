@@ -2,7 +2,7 @@ const { User, Token } = require("../models")
 const bcrypt = require("bcryptjs")
 const ApiError = require("../helpers/ApiError")
 const jwt = require("jsonwebtoken")
-const { tokenService } = require(".")
+const tokenService = require("./token.service")
 
 const register = async (data) => {
     try {
@@ -128,21 +128,20 @@ const emailVerification = async (data) => {
     }
 }
 
-const resetPassword = async (resetPasswordToken, newPassword) => {
+const resetPassword = async (body, email) => {
     try {
-        const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, "resetPassword")
-        console.log(resetPasswordTokenDoc)
-        const user = await User.findById(resetPasswordTokenDoc.user)
-        if (!user) throw new ApiError(400, "Password reset failed")
-        await Token.deleteMany({ user: user.id, type: "resetPassword" })
-        const hashedPassword = await bcrypt.hash(newPassword, 10)
+        const user = await User.findOne({ email })
+        if (!user) throw new ApiError(400, "Password reset failed. Invalid user")
+        var response = await comparePassword(body.oldPassword, user)
+        if (!response) throw new ApiError(400, "Password reset failed. Incorrect password")
+        const hashedPassword = await bcrypt.hash(body.newPassword, 10)
         const updateUser = await updateUserById(user.id, {
             password: hashedPassword
         })
         return updateUser
     } catch (error) {
         console.log(error)
-        throw new ApiError(
+        throw new ApiError( 
             400,
             (error && error.message) || "Password reset failed"
         )
