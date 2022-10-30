@@ -77,7 +77,7 @@ const forgotPassword = catchAsync(async (req, res) => {
     const template = "/templates/views/forgot-password.html"
     const subject = "Password Reset Request"
     const frontendUrl = process.env.FRONTEND_URL
-    const resetUrl = frontendUrl + "reset-password/" + resetPasswordToken
+    const resetUrl = `${frontendUrl}reset-password/${resetPasswordToken}`
     const to = user.email
     const data = {
         "name": user.firstName,
@@ -91,8 +91,8 @@ const forgotPassword = catchAsync(async (req, res) => {
 })
 
 const resetPassword = catchAsync(async (req, res) => {
-    await authService.resetPassword(req.body, req.user.email)
-    res.status(201).send({
+    await authService.resetPassword(req.body.token, req.body.newPassword)
+    res.status(200).send({
         message: "password reset successfully",
         data: {}
     })
