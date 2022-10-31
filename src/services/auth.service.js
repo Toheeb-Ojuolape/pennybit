@@ -106,7 +106,7 @@ const updateUserById = async (userId, updateBody) => {
         if (!user) throw new ApiError(400, "User not found")
         if (updateBody.email) {
             const check = await User.findById(userId)
-            if (check) throw new ApiError(400, "Email already taoken")
+            if (check) throw new ApiError(400, "Email already taken")
         }
         Object.assign(user, updateBody)
         await user.save()
@@ -128,20 +128,18 @@ const emailVerification = async (data) => {
     }
 }
 
-const resetPassword = async (body, email) => {
+const resetPassword = async (token, newPassword) => {
     try {
-        const user = await User.findOne({ email })
-        if (!user) throw new ApiError(400, "Password reset failed. Invalid user")
-        var response = await comparePassword(body.oldPassword, user)
-        if (!response) throw new ApiError(400, "Password reset failed. Incorrect password")
-        const hashedPassword = await bcrypt.hash(body.newPassword, 10)
-        const updateUser = await updateUserById(user.id, {
+        var response = await tokenService.verifyTokenResetPassword(token, "resetPassword")
+        if (!response) throw new ApiError(400, "Password reset failed. Incorrect token")
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+        const updateUser = await updateUserById(response.sub, {
             password: hashedPassword
         })
         return updateUser
     } catch (error) {
         console.log(error)
-        throw new ApiError( 
+        throw new ApiError(
             400,
             (error && error.message) || "Password reset failed"
         )
