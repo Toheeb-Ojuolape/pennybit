@@ -15,7 +15,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [login, { data, isLoading, isSuccess, isError, error }] = useLoginUserMutation();
   const dispatch = useDispatch();
-  
+
   const handleSubmit = (values) => {
     login(values);
   };
@@ -23,7 +23,7 @@ const Login = () => {
   useEffect(() => {
     if (isSuccess) {
       dispatch(setLoginUser(data));
-      navigate("/overview-admin");
+      navigate("/dashboard");
     }
     if (isError && error && "status" in error) {
       toast.error(error?.data?.message);

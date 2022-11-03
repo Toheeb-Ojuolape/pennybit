@@ -5,7 +5,7 @@ import Icon from "./Icons";
 
 const InputField = ({ label, placeholder, isPassword, password, setPassword, name, setFieldTouched, handleSubmit }) => {
   return (
-    <div className="mt-3">
+    <div className="mt-1">
       <div className="py-2 relative">
         <label className="text-xs text-black font-medium">{label}</label>
         <Field

@@ -1,6 +1,5 @@
 import React from "react";
 import Register from "./pages/Register";
-import Gender from "./pages/Gender";
 import ConfirmEmail from "./pages/ConfirmEmail";
 import Dashboard from "./pages/Dashboard";
 import Wallet from "./pages/Wallet";
@@ -43,7 +42,6 @@ const App = () => {
           <Route path="/paymentlink" element={<PaymentLink />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<NewPassword />} />
-          <Route path="/gender" element={<Gender />} />
           <Route path="/confirm-email" element={<ConfirmEmail />} />
           <Route path="/verification" element={<Verification />} />
         </Routes>

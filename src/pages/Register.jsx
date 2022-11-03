@@ -23,15 +23,15 @@ const Register = () => {
   const [register, { data, isLoading, isSuccess, isError, error }] = useRegisterUserMutation();
   const dispatch = useDispatch();
   const handleSubmit = (values, { setFieldTouched }) => {
-    if (!youngster) {
-      setFieldTouched("gender", true);
-      setSelectGender(true);
-      if (selectGender) {
+    setFieldTouched("gender", true);
+    setSelectGender(true);
+    if (selectGender) {
+      if (!youngster) {
         const { dateOfBirth, ...rest } = values;
         register({ ...rest, gender: selected?.value });
+      } else {
+        register({ ...values, gender: selected?.value });
       }
-    } else {
-      register(values);
     }
   };
 
