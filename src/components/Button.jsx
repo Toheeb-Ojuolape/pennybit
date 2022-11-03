@@ -1,12 +1,15 @@
 import React from "react";
+import Spinner from "./Loader/Spinner";
 
-const Button = ({ content, onClick }) => {
+const Button = ({ onClick, loader, children, classname, disabled, ...rest }) => {
   return (
     <button
       onClick={onClick}
-      className="p-3 mt-4 rounded-full focus:outline-none text-white bg-orange w-full text-lg hover:border-2 hover:border-orange hover:text-orange hover:bg-transparent"
+      {...rest}
+      disabled={disabled}
+      className={`p-3 mt-4 rounded-full focus:outline-none text-white ${disabled ? "bg-[#E0E0E0]" : "bg-orange "} w-full text-lg`}
     >
-      {content}
+      {loader ? <Spinner /> : <>{children}</>}
     </button>
   );
 };

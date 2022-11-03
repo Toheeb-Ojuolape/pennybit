@@ -13,3 +13,23 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.Toastify__toast--success {
+  background: #05944f !important;
+}
+.Toastify__toast--warning {
+  background: #f9a200 !important;
+}
+.Toastify__toast--error {
+  background: #e11900 !important;
+}
+
+.Toastify__toast--error::after,
+.Toastify__toast--success::after,
+.Toastify__toast--warning::after {
+  content: url("../public/svgs/close-icon.svg");
+  position: absolute;
+  margin-right: 10px;
+  right: 0;
+  padding-top: 14px !important;
+}

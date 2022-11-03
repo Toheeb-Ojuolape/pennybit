@@ -1,14 +1,21 @@
+import dayjs from "dayjs";
 import React from "react";
 import Image02 from "../assets/image/Vector.jpg";
 
-const RegisterHeader = ({ youngster, setYoungster }) => {
+const RegisterHeader = ({ youngster, setYoungster, setFieldValue }) => {
   return (
     <>
       <div className="flex justify-between text-[14px] pb-3">
         <button className={`font-bold w-[50%] ${youngster && "bg-background border-b-2 border-orange py-2"}`} onClick={() => setYoungster(true)}>
           As a Youngster
         </button>
-        <button className={`font-bold w-[50%] ${!youngster && "bg-background border-b-2 border-orange py-2"}`} onClick={() => setYoungster(false)}>
+        <button
+          className={`font-bold w-[50%] ${!youngster && "bg-background border-b-2 border-orange py-2"}`}
+          onClick={() => {
+            setFieldValue("dateOfBirth", dayjs(new Date()).format("YYYY-MM-DD"));
+            setYoungster(false);
+          }}
+        >
           As a Parent
         </button>
       </div>

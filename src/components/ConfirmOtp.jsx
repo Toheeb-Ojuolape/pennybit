@@ -1,11 +1,32 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import OTPInput from "../components/OTPInput/Index";
 import AuthScreen from "../HOC/AuthScreen";
+import { useActivateUserMutation } from "../redux/services";
 import Button from "./Button";
 
 const ConfirmOTP = ({ title }) => {
   const [otp, setOtp] = React.useState("");
-  console.log(otp);
+  const email = JSON.parse(localStorage.getItem("email"));
+  const navigate = useNavigate();
+  const [verifyUser, { isLoading, isSuccess, isError, error }] = useActivateUserMutation();
+  const dispatch = useDispatch();
+
+  const handleSubmit = () => {
+    verifyUser({ pin: otp, email });
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch({ type: "LOGOUT" });
+      navigate("/");
+    }
+    if (isError && error && "status" in error) {
+      toast.error(error?.data?.message);
+    }
+  }, [isLoading, isSuccess, isError, error, navigate, dispatch]);
 
   return (
     <AuthScreen title={title} subtitle={"We’ve sent an OTP to your email. Kindly enter it below to confirm your email address"}>
@@ -19,7 +40,9 @@ const ConfirmOTP = ({ title }) => {
           onChangeOTP={(otp) => setOtp(otp)}
         />
       </div>
-      <Button content={"Confirm Code"} />
+      <Button disabled={otp.length !== 5} onClick={handleSubmit} loader={isLoading}>
+        Confirm Code
+      </Button>
       <div>
         <p className="text-base text-center mt-4">
           Didn’t receive an OTP?
