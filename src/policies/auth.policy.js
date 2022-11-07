@@ -13,6 +13,23 @@ const login = {
   })
 }
 
+const lndLogin = {
+  body: Joi.object().keys({
+    host: Joi.string().required().messages({
+      "string.empty": `host cannot be an empty field`,
+      "any.required": `host is a required field`,
+    }),
+    cert: Joi.string().required().messages({
+      "string.empty": `cert cannot be an empty field`,
+      "any.required": `cert is a required field`,
+    }),
+    macaroon: Joi.string().required().messages({
+      "string.empty": `macaroon cannot be an empty field`,
+      "any.required": `macaroon is a required field`,
+    })
+  })
+}
+
 const confirmAccount = {
   body: Joi.object().keys({
     email: Joi.string().required().messages({
@@ -135,5 +152,6 @@ module.exports = {
   resetPassword,
   updatePassword,
   resendMail,
-  updateUser
+  updateUser,
+  lndLogin
 }

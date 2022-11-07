@@ -2,8 +2,7 @@ const ApiError = require("../helpers/ApiError")
 const catchAsync = require("../helpers/catchAsync")
 const pick = require("../helpers/pick")
 const sendMail = require("../helpers/mail")
-
-const { authService, tokenService } = require("../services")
+const { authService, tokenService, lightningService } = require("../services")
 
 require("dotenv").config()
 
@@ -41,6 +40,16 @@ const login = catchAsync(async (req, res) => {
         data: {
             user,
             token: token.access.token
+        }
+    })
+})
+
+const lndLogin = catchAsync(async (req, res) => {
+    const lndToken = await lightningService.lndConnection(req.body)
+    res.status(201).send({
+        message: "LND connection was successful",
+        data: {
+            lndToken
         }
     })
 })
@@ -90,30 +99,6 @@ const forgotPassword = catchAsync(async (req, res) => {
     })
 })
 
-const resetPassword = catchAsync(async (req, res) => {
-    await authService.resetPassword(req.body.token, req.body.newPassword)
-    res.status(200).send({
-        message: "password reset successfully",
-        data: {}
-    })
-})
-
-const updatePassword = catchAsync(async (req, res) => {
-    await authService.updatePassword(req.user.email, req.body.oldPassword, req.body.newPassword)
-    res.status(200).send({
-        message: "Password updated successfully",
-        data: {}
-    })
-})
-
-const updateUserById = catchAsync(async (req, res) => {
-    if (req.body.password) throw new ApiError("You can't update your password here")
-    const user = await authService.updateUserById(req.user._id, req.body)
-    res.status(201).send({
-        message: "User updated successfully",
-        data: { user }
-    })
-})
 
 const getUser = catchAsync(async (req, res) => {
     let user;
@@ -151,9 +136,7 @@ module.exports = {
     emailVerification,
     resendTokens,
     forgotPassword,
-    resetPassword,
-    updatePassword,
-    updateUserById,
     getUser,
-    getUsers
+    getUsers,
+    lndLogin
 }

@@ -18,6 +18,12 @@ router.post(
 )
 
 router.post(
+    "/lndlogin",
+    [validate(authValidation.lndLogin), authService.validateToken],
+    authController.lndLogin
+)
+
+router.post(
     "/verifyaccount",
     [validate(authValidation.confirmAccount)],
     authController.emailVerification
@@ -29,24 +35,23 @@ router.post(
     authController.forgotPassword
 )
 
-router.post(
-    "/reset/password",
-    [validate(authValidation.resetPassword)],
-    authController.resetPassword
-)
+// router.post(
+//     "/reset/password",
+//     [validate(authValidation.resetPassword)],
+//     authController.resetPassword
+// )
 
-router.put(
-    "/update/password",
-    [validate(authValidation.updatePassword), authService.validateToken],
-    authController.updatePassword
-)
+// router.put(
+//     "/update/password",
+//     [validate(authValidation.updatePassword), authService.validateToken],
+//     authController.updatePassword
+// )
 
-router.post(
-    "/update",
-    [validate(authValidation.updateUser), authService.validateToken],
-    authController.updateUserById
-)
-
+// router.post(
+//     "/update",
+//     [validate(authValidation.updateUser), authService.validateToken],
+//     authController.updateUserById
+// )
 
 router.get(
     "/account/resend",
