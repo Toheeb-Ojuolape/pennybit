@@ -24,6 +24,24 @@ router.post(
 )
 
 router.post(
+    "/lndnodeinfo",
+    [validate(authValidation.nodeInfo), authService.validateToken],
+    authController.getNodeInfo
+)
+
+router.post(
+    "/createinvoice",
+    [authService.validateToken],
+    authController.createInvoice
+)
+
+router.post(
+    "/lookupinvoice",
+    [authService.validateToken],
+    authController.confirmInvoicePayment
+)
+
+router.post(
     "/verifyaccount",
     [validate(authValidation.confirmAccount)],
     authController.emailVerification

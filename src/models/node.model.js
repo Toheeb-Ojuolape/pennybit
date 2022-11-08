@@ -16,6 +16,9 @@ const nodeSchema = mongoose.Schema({
     pubkey: {
         type: String,
     },
+    userId: {
+        type: String,
+    }
 }, { timestamps: true })
 
 const NodeModel = mongoose.model("Node", nodeSchema)

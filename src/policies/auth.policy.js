@@ -102,6 +102,15 @@ const forgotPassword = {
   }),
 }
 
+const nodeInfo = {
+  body: Joi.object().keys({
+    token: Joi.string().required().messages({
+      "string.empty": `token cannot be an empty field`,
+      "any.required": `token is a required field`,
+    }),
+  }),
+}
+
 const resetPassword = {
   body: Joi.object().keys({
     token: Joi.string().required().messages({
@@ -153,5 +162,6 @@ module.exports = {
   updatePassword,
   resendMail,
   updateUser,
-  lndLogin
+  lndLogin,
+  nodeInfo
 }

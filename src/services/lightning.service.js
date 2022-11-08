@@ -4,6 +4,8 @@ const ApiError = require("../helpers/ApiError")
 const jwt = require("jsonwebtoken")
 const tokenService = require("./token.service")
 const nodeService = require("./node.service")
+const lnrpc = require("@radar/lnrpc")
+const { default: nodeManager } = require("../lightningManager/nodeManager")
 
 // try {
 //     const { token, pubkey } = await nodeManager.connect(host, cert, macaroon)
@@ -32,169 +34,72 @@ const register = async (data) => {
     }
 }
 
-const lndConnection = async (data) => {
+const lndConnection = async (userId, data) => {
     try {
+        console.log(userId)
         const { host, cert, macaroon } = data
         const { token, identityPubkey } = await nodeService.connectLnd(host, cert, macaroon)
+        //const info = await nodeManager.connect(host, cert, macaroon)
+        const existingNode = await Node.findOne({ host })
+        if(!existingNode){
+            await Node.create({
+                host,
+                cert,
+                macaroon,
+                token: info.token,
+                pubkey: info.identityPubkey,
+                userId
+            })
+        }
         return JSON.parse(JSON.stringify(token))
     } catch (error) {
-        
-    }
-}
-const login = async (email, password) => {
-    try {
-        const user = await User.findOne({ email })
-        if (!user) throw new ApiError(400, "invalid email or password")
-        if (!user.accountConfirmed) throw new ApiError(400, "Account not activated")
-        if (!user.status) throw new ApiError(400, "Your account is not activated")
-        await comparePassword(password, user)
-        return user
-    } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error)
+        throw new ApiError(error.code || 500, error.message || error)   
     }
 }
 
-const comparePassword = async (password, user) => {
+const getNodeInfo = async (token) => {
     try {
-        const result = await bcrypt.compare(password, user.password)
-        if (!result) throw new ApiError(400, "Invalid email or password")
-        return result
-    } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error)
-    }
-}
-
-const getUsers = async (criteria = {}, options = {}) => {
-    try {
-        const { sort = { createdAt: -1 }, limit, page } = options
-        const _limit = parseInt(limit, 10)
-        const _page = parseInt(page, 10)
-        const users = await User.find(criteria)
-            .sort(sort)
-            .limit(_limit)
-            .skip(_limit * (_page - 1))
-        return { users, page: _page }
-    } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error)
-    }
-}
-
-const getUserByEmail = async (email) => {
-    try {
-        const user = await User.findOne({ email })
-        if (!user) throw new ApiError(400, "Invalid user")
-        return JSON.parse(JSON.stringify(user))
-    } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error);
-    }
-}
-
-const getUserById = async (_id) => {
-    try {
-        const user = await User.findOne({ _id })
-        if (!user) throw new ApiError(400, "Invalid user")
-        return JSON.parse(JSON.stringify(user))
-    } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error);
-    }
-}
-
-const validateToken = function (req, res, next) {
-    const bearerHeader = req.headers.authorization
-    if (!bearerHeader) throw new ApiError(400, "You need to attach a token")
-    const bearer = bearerHeader.split(" ")
-    const [, token] = bearer
-    req.token = token
-    jwt.verify(req.token, process.env.JWT_SECRET_KEY, (err, authData) => {
-        if (err) {
-            const errorCode = err.code || 500
-            const errorMessage = err.message || err
-            return res.status(errorCode).send({
-                message: `${errorMessage}`,
-            })
-        } else {
-            req.user = authData.user; // Add User Id to request
-            next();
+        if(!token){
+            throw new ApiError(400, "Your node is not connected")
         }
-    })
-}
-
-const updateUserById = async (userId, updateBody) => {
-    try {
-        const user = await User.findById(userId)
-        if (!user) throw new ApiError(400, "User not found")
-        if (updateBody.email) {
-            const check = await User.findById(userId)
-            if (check) throw new ApiError(400, "Email already taken")
-        }
-        Object.assign(user, updateBody)
-        await user.save()
-        return user
+        const rpc = nodeService.getRpc(token)
+        const { alias } = await rpc.getInfo()
+        const { balance } = await rpc.channelBalance()
+        return {alias, balance}
     } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error);
+        throw new ApiError(error.code || 500, error.message || error)
     }
 }
 
-const emailVerification = async (data) => {
-    try {
-        console.log("point one")
-        let user = await User.findOne({ email: data.email, pin: data.pin })
-        if (!user) throw new ApiError(400, "Invalid user")
-        user = await updateUserById(user._id, { accountConfirmed: true, status: "Active" })
-        return user
-    } catch (error) {
-        throw new ApiError(error.code || 500, error.message || "An error occured");
+const createInvoice = async (data) => {
+    const rpc = nodeService.getRpc(data.token)
+    const inv = await rpc.addInvoice({ value: data.amount.toString() })
+    var invoiceData = {
+        payreq: inv.paymentRequest,
+        hash: (inv.rHash).toString('base64'),
+        amount: data.amount
     }
+    return JSON.parse(JSON.stringify(invoiceData))
 }
 
-const resetPassword = async (token, newPassword) => {
-    try {
-        var response = await tokenService.verifyTokenResetPassword(token, "resetPassword")
-        if (!response) throw new ApiError(400, "Password reset failed. Incorrect token")
-        const hashedPassword = await bcrypt.hash(newPassword, 10)
-        const updateUser = await updateUserById(response.sub, {
-            password: hashedPassword
-        })
-        return updateUser
-    } catch (error) {
-        console.log(error)
-        throw new ApiError(
-            400,
-            (error && error.message) || "Password reset failed"
-        )
+const lookupInvoiceHash = async (data) => {
+    const rpc = nodeService.getRpc(data.token)
+    const rHash = Buffer.from(data.hash, 'base64')
+    console.log("Haloo") 
+    const { settled } = await rpc.lookupInvoice({ rHash });
+    if(!settled){
+        throw new Error("The payment has not been made!")
     }
+    return JSON.parse(JSON.stringify(settled))
 }
 
-const updatePassword = async (email, oldPassword, newPassword) => {
-    try {
-        const user = await User.findOne({ email })
-        if (!user) throw new ApiError(400, "Invalid email or password")
-        const verifyUser = await comparePassword(oldPassword, user)
-        const hashedPassword = await bcrypt.hash(newPassword, 10)
-        await updateUserById(user.id, { password: hashedPassword })
-    } catch (error) {
-        throw new ApiError(
-            400,
-            (error && error.message) || "Password reset failed"
-        );
-    }
-}
 
-const count = async (criteria = {}) => {
-    return await User.find(criteria).countDocuments();
-}
+
 
 module.exports = {
     register,
-    login,
-    getUserByEmail,
-    getUserById,
-    getUsers,
-    validateToken,
-    updateUserById,
-    emailVerification,
-    resetPassword,
-    updatePassword,
-    count,
-    lndConnection
+    lndConnection,
+    getNodeInfo,
+    createInvoice,
+    lookupInvoiceHash
 }

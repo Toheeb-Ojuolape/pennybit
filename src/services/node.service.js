@@ -1,64 +1,13 @@
 const uuid = require("uuid")
 const lnrpc = require("@radar/lnrpc")
 
-// import EventEmitter from "events"
-// import { Node } from "../models"
-
-// class NodeService extends EventEmitter{
-//     constructor(){
-//     }
-
-//     createNode = async(node) => {
-//         let existingNode = await Node.findOne({ host: node.host })
-//         if(existingNode){
-//             const err = {
-//                 code: 400,
-//                 message: "A node already exist"
-//             }
-//             throw err
-//         }
-//         await Node.create(node);
-//     }   
-    
-//     getNodeByPubkey = async (pubkey) => {
-//         const node = await Node.findOne({ pubkey })
-//         if(!node){
-//             const err = {
-//                 code: 400,
-//                 message: "No node exist with that pubkey"
-//             }
-//             throw err 
-//         }
-//         return node
-//     }
-
-//     getNodeByToken = async (token) => {
-//         const node = await Node.findOne({ token })
-//         if(!node){
-//             const err = {
-//                 code: 400,
-//                 message: "No node exist with that token"
-//             }
-//             throw err 
-//         }
-//         return node
-//     }
-
-//     getAllNodes = async () => {
-//         const nodes = await Node.find();
-//         if(!node){
-//             const err = {
-//                 code: 400,
-//                 message: "No available node"
-//             }
-//             throw err 
-//         }
-//         return nodes
-//     }
-// }
-
-
-// export default new NodeService()
+let lndNodes = {}
+const getRpc = (token) => {
+    if(!token){
+        throw new Error("Not authorized. You must login first")
+    }
+    return lndNodes[token]
+}
 
 const connectLnd = async (host, cert, macaroon, prevToken = null) => {
     const token = prevToken !== null ? prevToken : uuid.v4().replace(/-/g, '')
@@ -83,6 +32,9 @@ const connectLnd = async (host, cert, macaroon, prevToken = null) => {
         await rpc.lookupInvoice({ rHash })
         // listen for payments from LND
         listenForPayments(rpc, identityPubkey)
+
+        lndNodes[token] = rpc
+
         // Return this node's token for future requests
         return { token, identityPubkey }
 
@@ -106,5 +58,6 @@ const listenForPayments = async(rpc, pubkey) => {
 }
 
 module.exports = {
-    connectLnd
+    connectLnd,
+    getRpc
 }

@@ -45,11 +45,43 @@ const login = catchAsync(async (req, res) => {
 })
 
 const lndLogin = catchAsync(async (req, res) => {
-    const lndToken = await lightningService.lndConnection(req.body)
+    const lndToken = await lightningService.lndConnection(req.user._id, req.body)
     res.status(201).send({
         message: "LND connection was successful",
         data: {
             lndToken
+        }
+    })
+})
+
+const getNodeInfo = catchAsync(async (req, res) => {
+    const { token } = req.body
+    const {balance, alias } = await lightningService.getNodeInfo(token)
+    res.status(201).send({
+        message: "Getting Node information was successful",
+        data: {
+            balance,
+            alias
+        }
+    })
+})
+
+const createInvoice = catchAsync(async (req, res) => {
+    const invoice = await lightningService.createInvoice(req.body)
+    res.status(201).send({
+        message: "Creating Invoice was successful",
+        data: {
+            invoice
+        }
+    })
+})
+
+const confirmInvoicePayment = catchAsync(async (req, res) => {
+    const invoice = await lightningService.lookupInvoiceHash(req.body)
+    res.status(201).send({
+        message: "Confirmation of lightning invoice was successful",
+        data: {
+            invoice
         }
     })
 })
@@ -138,5 +170,8 @@ module.exports = {
     forgotPassword,
     getUser,
     getUsers,
-    lndLogin
+    lndLogin,
+    getNodeInfo,
+    createInvoice,
+    confirmInvoicePayment
 }
