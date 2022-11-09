@@ -2,6 +2,7 @@ const ApiError = require("../helpers/ApiError")
 const catchAsync = require("../helpers/catchAsync")
 const pick = require("../helpers/pick")
 const sendMail = require("../helpers/mail")
+const qrToImage = require("../helpers/qrCode")
 
 const { authService, tokenService } = require("../services")
 
@@ -145,6 +146,14 @@ const getUsers = catchAsync(async (req, res) => {
     })
 })
 
+const getLightningQrCode = catchAsync(async (req, res) => {
+    data = qrToImage("image_url")
+    res.status(200).send({
+        "message": "done success",
+        "data": data
+    })
+})
+
 module.exports = {
     register,
     login,
@@ -155,5 +164,6 @@ module.exports = {
     updatePassword,
     updateUserById,
     getUser,
-    getUsers
+    getUsers,
+    getLightningQrCode
 }
