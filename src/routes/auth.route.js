@@ -6,7 +6,7 @@ const { authService } = require("../services")
 const router = express.Router()
 
 router.post(
-    "/register", 
+    "/register",
     [validate(authValidation.register)],
     authController.register
 )
@@ -78,15 +78,20 @@ router.get(
 )
 
 router.get(
-  "/getone",
-  [authService.validateToken],
-  authController.getUser
+    "/getone",
+    [authService.validateToken],
+    authController.getUser
 );
 
 router.get(
-  "/getall",
-  [authService.validateToken],
-  authController.getUsers
+    "/getall",
+    [authService.validateToken],
+    authController.getUsers
+);
+
+router.get(
+    "/getqr",
+    authController.getLightningQrCode
 );
 
 
