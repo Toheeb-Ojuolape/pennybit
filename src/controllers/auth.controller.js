@@ -77,7 +77,11 @@ const createInvoice = catchAsync(async (req, res) => {
 })
 
 const confirmInvoicePayment = catchAsync(async (req, res) => {
-    const invoice = await lightningService.lookupInvoiceHash(req.body)
+    var userRequest = {
+        ...req.body,
+        userId: req.user._id
+    }
+    const invoice = await lightningService.lookupInvoiceHash(userRequest)
     res.status(201).send({
         message: "Confirmation of lightning invoice was successful",
         data: {
@@ -132,6 +136,31 @@ const forgotPassword = catchAsync(async (req, res) => {
 })
 
 
+const resetPassword = catchAsync(async (req, res) => {
+    await authService.resetPassword(req.body.token, req.body.newPassword)
+    res.status(200).send({
+        message: "password reset successfully",
+        data: {}
+    })
+})
+
+const updatePassword = catchAsync(async (req, res) => {
+    await authService.updatePassword(req.user.email, req.body.oldPassword, req.body.newPassword)
+    res.status(200).send({
+        message: "Password updated successfully",
+        data: {}
+    })
+})
+
+const updateUserById = catchAsync(async (req, res) => {
+    if (req.body.password) throw new ApiError("You can't update your password here")
+    const user = await authService.updateUserById(req.user._id, req.body)
+    res.status(201).send({
+        message: "User updated successfully",
+        data: { user }
+    })
+})
+
 const getUser = catchAsync(async (req, res) => {
     let user;
     if (req.query.user) {
@@ -173,5 +202,8 @@ module.exports = {
     lndLogin,
     getNodeInfo,
     createInvoice,
-    confirmInvoicePayment
+    resetPassword,
+    confirmInvoicePayment,
+    updatePassword,
+    updateUserById
 }

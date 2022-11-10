@@ -4,6 +4,7 @@ const ApiError = require("../helpers/ApiError")
 const jwt = require("jsonwebtoken")
 const tokenService = require("./token.service")
 const nodeService = require("./node.service")
+const transactionService = require("./transaction.service")
 const lnrpc = require("@radar/lnrpc")
 const { default: nodeManager } = require("../lightningManager/nodeManager")
 
@@ -90,11 +91,14 @@ const lookupInvoiceHash = async (data) => {
     if(!settled){
         throw new Error("The payment has not been made!")
     }
-    return JSON.parse(JSON.stringify(settled))
+    var transactionInfo = {
+        transactionType: "DEBIT",
+        amount: data.amount,
+        userId: data.userId
+    }
+    await transactionService.createTransaction(transactionInfo)
+    return JSON.parse(JSON.stringify(transactionService))
 }
-
-
-
 
 module.exports = {
     register,

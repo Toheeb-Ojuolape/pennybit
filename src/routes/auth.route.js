@@ -36,8 +36,8 @@ router.post(
 )
 
 router.post(
-    "/lookupinvoice",
-    [authService.validateToken],
+    "/confirminvoice",
+    [validate(authValidation.confirmLndInvoice), authService.validateToken],
     authController.confirmInvoicePayment
 )
 
@@ -53,23 +53,23 @@ router.post(
     authController.forgotPassword
 )
 
-// router.post(
-//     "/reset/password",
-//     [validate(authValidation.resetPassword)],
-//     authController.resetPassword
-// )
+router.post(
+    "/reset/password",
+    [validate(authValidation.resetPassword)],
+    authController.resetPassword
+)
 
-// router.put(
-//     "/update/password",
-//     [validate(authValidation.updatePassword), authService.validateToken],
-//     authController.updatePassword
-// )
+router.put(
+    "/update/password",
+    [validate(authValidation.updatePassword), authService.validateToken],
+    authController.updatePassword
+)
 
-// router.post(
-//     "/update",
-//     [validate(authValidation.updateUser), authService.validateToken],
-//     authController.updateUserById
-// )
+router.post(
+    "/update",
+    [validate(authValidation.updateUser), authService.validateToken],
+    authController.updateUserById
+)
 
 router.get(
     "/account/resend",

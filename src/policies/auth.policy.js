@@ -92,6 +92,23 @@ const updateUser = {
   })
 }
 
+const confirmLndInvoice = {
+  body: Joi.object().keys({
+    token: Joi.string().required().messages({
+      "string.empty": `token cannot be an empty field`,
+      "any.required": `token is a required field`,
+    }),
+    hash: Joi.string().required().messages({
+      "string.empty": `hash cannot be an empty field`,
+      "any.required": `hash is a required field`,
+    }),
+    amount: Joi.string().required().messages({
+      "string.empty": `amount cannot be an empty field`,
+      "any.required": `amount is a required field`,
+    })
+  })
+}
+
 const forgotPassword = {
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
@@ -138,6 +155,8 @@ const updatePassword = {
     }),
     oldPassword: Joi.string().required().messages({
       "string.empty": `Old Password cannot be an empty field`,
+      "string.min": `New Password should have a minimum length of {#limit}`,
+      "string.max": `New Password should have a maximum length of {#limit}`,
       "any.required": `Old Password is a required field`,
     }),
   }),
@@ -163,5 +182,6 @@ module.exports = {
   resendMail,
   updateUser,
   lndLogin,
-  nodeInfo
+  nodeInfo,
+  confirmLndInvoice
 }
