@@ -18,6 +18,30 @@ router.post(
 )
 
 router.post(
+    "/lndlogin",
+    [validate(authValidation.lndLogin), authService.validateToken],
+    authController.lndLogin
+)
+
+router.post(
+    "/lndnodeinfo",
+    [validate(authValidation.nodeInfo), authService.validateToken],
+    authController.getNodeInfo
+)
+
+router.post(
+    "/createinvoice",
+    [authService.validateToken],
+    authController.createInvoice
+)
+
+router.post(
+    "/confirminvoice",
+    [validate(authValidation.confirmLndInvoice), authService.validateToken],
+    authController.confirmInvoicePayment
+)
+
+router.post(
     "/verifyaccount",
     [validate(authValidation.confirmAccount)],
     authController.emailVerification
@@ -46,7 +70,6 @@ router.post(
     [validate(authValidation.updateUser), authService.validateToken],
     authController.updateUserById
 )
-
 
 router.get(
     "/account/resend",

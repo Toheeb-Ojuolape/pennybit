@@ -1,6 +1,33 @@
 const {  Transaction } = require("../models")
 const ApiError = require("../helpers/ApiError")
 
+const ticks = ((new Date().getTime() * 10000) + 621355968000000000)
+const reference = `PennyBit_${ticks}`
+
+const createTransaction = async (body) => {
+    try {
+        await Transaction.create({
+            user: body.userId,
+            narration: "Transfer successful",
+            transactionStatus: "SUCCESS",
+            transactionType: body.transactionType,
+            amount: parseInt(body.amount),
+            transactionReference: reference
+        })
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error); 
+    }
+}
+
+const updateSingleTransaction = async (status, txnRef) => {
+    try {
+        var transaction = await transactionService.findOneTransaction(txnRef)
+        if(!transaction) throw new ApiError(400, "Transaction with that reference does not exist")
+        await updateTransaction({ transactionReference: txnRef }, status)
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)
+    }
+}
 
 const findOneTransaction = async (ref) => {
     try {
@@ -64,5 +91,7 @@ module.exports = {
     count,
     findOneTransaction,
     findTransactions,
-    updateTransaction
+    updateTransaction,
+    createTransaction,
+    updateSingleTransaction
 }
