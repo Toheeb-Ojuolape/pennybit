@@ -2,7 +2,9 @@ const ApiError = require("../helpers/ApiError")
 const catchAsync = require("../helpers/catchAsync")
 const pick = require("../helpers/pick")
 const sendMail = require("../helpers/mail")
-const { authService, tokenService, lightningService } = require("../services")
+const qrToImage = require("../helpers/qrCode")
+
+const { authService, tokenService } = require("../services")
 
 require("dotenv").config()
 
@@ -191,6 +193,14 @@ const getUsers = catchAsync(async (req, res) => {
     })
 })
 
+const getLightningQrCode = catchAsync(async (req, res) => {
+    data = qrToImage("image_url")
+    res.status(200).send({
+        "message": "done success",
+        "data": data
+    })
+})
+
 module.exports = {
     register,
     login,
@@ -205,5 +215,8 @@ module.exports = {
     resetPassword,
     confirmInvoicePayment,
     updatePassword,
-    updateUserById
+    updateUserById,
+    getUser,
+    getUsers,
+    getLightningQrCode
 }

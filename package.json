@@ -31,7 +31,7 @@
     "moment": "^2.29.4",
     "mongoose": "^6.6.5",
     "nodemailer": "^6.8.0",
-    "uuid": "^9.0.0",
+    "qrcode": "^1.5.1",
     "winston": "^3.8.2"
   },
   "devDependencies": {
