@@ -6,22 +6,23 @@ const reference = `PennyBit_${ticks}`
 
 const createTransaction = async (body) => {
     try {
-        await Transaction.create({
+        const newTransaction = await Transaction.create({
             user: body.userId,
             narration: "Transfer successful",
-            transactionStatus: "SUCCESS",
             transactionType: body.transactionType,
             amount: parseInt(body.amount),
-            transactionReference: reference
+            transactionReference: reference,
+            invoice: body.invoice
         })
+        return JSON.parse(JSON.stringify(newTransaction))
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error); 
     }
 }
 
-const updateSingleTransaction = async (status, txnRef) => {
+const updateSingleTransaction = async (status, criteria) => {
     try {
-        var transaction = await transactionService.findOneTransaction(txnRef)
+        var transaction = await findOneTransaction(criteria)
         if(!transaction) throw new ApiError(400, "Transaction with that reference does not exist")
         await updateTransaction({ transactionReference: txnRef }, status)
     } catch (error) {
@@ -31,7 +32,7 @@ const updateSingleTransaction = async (status, txnRef) => {
 
 const findOneTransaction = async (ref) => {
     try {
-        const transaction = await Transaction.findOne({ transactionReference: ref })
+        const transaction = await Transaction.findOne({ ...ref })
         if(!transaction) throw new ApiError(400, "Transaction not found")
         return JSON.parse(JSON.stringify(transaction))
     } catch (error) {
@@ -53,7 +54,7 @@ const count = async = async (criteria = {}) => {
     return await Transaction.find(criteria).countDocuments()
 }
 
-const updateTransaction = async (criteria, status) => {
+const updateTransactionStatus = async (criteria, status) => {
     const transaction = await Transaction.findOne({ ...criteria })
     switch (status) {
         case "INITIATED":
@@ -91,7 +92,7 @@ module.exports = {
     count,
     findOneTransaction,
     findTransactions,
-    updateTransaction,
+    updateTransactionStatus,
     createTransaction,
     updateSingleTransaction
 }

@@ -13,12 +13,12 @@ var transactionSchema = new schema({
         required: true
     },
     transactionStatus: {
-        type: "string",
+        type: String,
         enum: ["INITIATED", "PROCESSING", "ABANDONED", "SUCCESS", "FAILED", "REVERSED", "CANCELLED"],
         default: "INITIATED",
     },
     transactionType: {
-        type: "string",
+        type: String,
         enum: ["CREDIT", "DEBIT"],
     },
     transactionReference: {
@@ -29,6 +29,9 @@ var transactionSchema = new schema({
     amount: {
         type: Number,
         required: true
+    },
+    invoice: {
+        type: String
     },
     transactionDate: {
         type: String,
