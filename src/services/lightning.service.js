@@ -1,21 +1,6 @@
-const { User, Token, Node } = require("../models")
-const bcrypt = require("bcryptjs")
 const ApiError = require("../helpers/ApiError")
-const jwt = require("jsonwebtoken")
-const tokenService = require("./token.service")
-const nodeService = require("./node.service")
 const transactionService = require("./transaction.service")
 const lnrpc = require("@radar/lnrpc")
-const { default: nodeManager } = require("../lightningManager/nodeManager")
-
-// try {
-//     const { token, pubkey } = await nodeManager.connect(host, cert, macaroon)
-//     await nodeService.createNode({ host, cert, macaroon, token, pubkey })
-//     return JSON.parse(JSON.stringify(user))
-// } catch (error) {
-//     throw new ApiError(error.code || 500, error.message || error)
-// }
-
 
 const connectRpc = async () => {
     try {
@@ -55,45 +40,6 @@ const generatingInvoice = async (amount) => {
         throw new ApiError(error.code || 500, error.message || error)
     }
 }
-
-const lndConnection = async (userId, data) => {
-    try {
-        console.log(userId)
-        const { host, cert, macaroon } = data
-        const { token, identityPubkey } = await nodeService.connectLnd(host, cert, macaroon)
-        //const info = await nodeManager.connect(host, cert, macaroon)
-        const existingNode = await Node.findOne({ host })
-        if(!existingNode){
-            await Node.create({
-                host,
-                cert,
-                macaroon,
-                token: info.token,
-                pubkey: info.identityPubkey,
-                userId
-            })
-        }
-        return JSON.parse(JSON.stringify(token))
-    } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error)   
-    }
-}
-
-const getNodeInfo = async (token) => {
-    try {
-        if(!token){
-            throw new ApiError(400, "Your node is not connected")
-        }
-        const rpc = nodeService.getRpc(token)
-        const { alias } = await rpc.getInfo()
-        const { balance } = await rpc.channelBalance()
-        return {alias, balance}
-    } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error)
-    }
-}
-
-
 
 const lookupInvoiceHash = async (data) => {
     const { lnRpcClient, routerClient } = await connectRpc()
@@ -136,6 +82,26 @@ const getFeeReport = async () => {
     }
 }
 
+const payWithInvoice = async (invoice) => {
+    try {
+        const { lnRpcClient, routerClient } = await connectRpc()
+    const invoicePayment = await lnRpcClient.sendPayment({ paymentRequest: invoice })
+    return invoicePayment
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)
+    }
+}
+
+const payWithHash = async (hash) => {
+    try {
+        const { lnRpcClient, routerClient } = await connectRpc()
+    const invoicePayment = await lnRpcClient.sendPayment({ paymentHash: hash })
+    return invoicePayment
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)
+    }
+}
+
 const subscribeToInvoice = async (body) => {
     try {
         const { lnRpcClient, routerClient } = await connectRpc()
@@ -167,13 +133,14 @@ const subscribeToInvoice = async (body) => {
 }
 
 module.exports = {
-    lndConnection,
-    getNodeInfo,
     lookupInvoiceHash,
     subscribeToInvoice,
     getFeeReport,
     invoiceLookUp,
     lookupInvoiceHash,
     generatingInvoice,
-    connectRpc
+    connectRpc,
+    decodeInvoice,
+    payWithHash,
+    payWithInvoice
 }
