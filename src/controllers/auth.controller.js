@@ -46,52 +46,6 @@ const login = catchAsync(async (req, res) => {
     })
 })
 
-const lndLogin = catchAsync(async (req, res) => {
-    const lndToken = await lightningService.lndConnection(req.user._id, req.body)
-    res.status(201).send({
-        message: "LND connection was successful",
-        data: {
-            lndToken
-        }
-    })
-})
-
-const getNodeInfo = catchAsync(async (req, res) => {
-    const { token } = req.body
-    const {balance, alias } = await lightningService.getNodeInfo(token)
-    res.status(201).send({
-        message: "Getting Node information was successful",
-        data: {
-            balance,
-            alias
-        }
-    })
-})
-
-const createInvoice = catchAsync(async (req, res) => {
-    const invoice = await lightningService.createInvoice(req.body)
-    res.status(201).send({
-        message: "Creating Invoice was successful",
-        data: {
-            invoice
-        }
-    })
-})
-
-const confirmInvoicePayment = catchAsync(async (req, res) => {
-    var userRequest = {
-        ...req.body,
-        userId: req.user._id
-    }
-    const invoice = await lightningService.lookupInvoiceHash(userRequest)
-    res.status(201).send({
-        message: "Confirmation of lightning invoice was successful",
-        data: {
-            invoice
-        }
-    })
-})
-
 const resendTokens = catchAsync(async (req, res) => {
     const tokens = await tokenService.generateResendTokens(req.user)
     // Send email
@@ -193,14 +147,6 @@ const getUsers = catchAsync(async (req, res) => {
     })
 })
 
-const getLightningQrCode = catchAsync(async (req, res) => {
-    data = qrToImage("image_url")
-    res.status(200).send({
-        "message": "done success",
-        "data": data
-    })
-})
-
 module.exports = {
     register,
     login,
@@ -209,14 +155,9 @@ module.exports = {
     forgotPassword,
     getUser,
     getUsers,
-    lndLogin,
-    getNodeInfo,
-    createInvoice,
     resetPassword,
-    confirmInvoicePayment,
     updatePassword,
     updateUserById,
     getUser,
     getUsers,
-    getLightningQrCode
 }

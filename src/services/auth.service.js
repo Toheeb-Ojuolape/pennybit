@@ -15,8 +15,9 @@ const register = async (data) => {
             throw err
         }
         data.password = await bcrypt.hash(data.password, 10)
-        user = await User.create(data)
-        return JSON.parse(JSON.stringify(user))
+        const newUser = await User.create(data)
+        console.log(newUser)
+        return JSON.parse(JSON.stringify(newUser))
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error)
     }
