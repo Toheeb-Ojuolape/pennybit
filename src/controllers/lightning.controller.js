@@ -89,10 +89,23 @@ const payUserInvoice = catchAsync(async (req, res) => {
     }
 })
 
+const lndConnect = catchAsync(async (req, res) => {
+    const user = await authService.getUserById(req.user._id)
+    if(!user) throw new ApiError(400, "User not found")
+    const connection = await lightningService.connectRpc()
+    res.status(201).send({
+        message: "Invoice payment was successful",
+        data: {
+            connection
+        }
+    })
+})
+
 
 module.exports = {
     createInvoice,
     payUserInvoice,
     lookupInvoice,
-    lookupInvoiceHash
+    lookupInvoiceHash,
+    lndConnect
 }

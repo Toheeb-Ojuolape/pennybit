@@ -13,13 +13,13 @@ router.post(
 
 router.post(
     "/invoicelookup",
-    [validate(lndValidation.createInvoice), authService.validateToken],
+    [validate(lndValidation.lookUpInvoice), authService.validateToken],
     lndController.lookupInvoice
 )
 
 router.post(
     "/invoicelookuphash",
-    [validate(lndValidation.createInvoice), authService.validateToken],
+    [validate(lndValidation.lookUpHash), authService.validateToken],
     lndController.lookupInvoiceHash
 )
 
@@ -28,5 +28,12 @@ router.post(
     [validate(lndValidation.createInvoice), authService.validateToken],
     lndController.payUserInvoice
 )
+
+router.post(
+    "/lndconnect",
+    authService.validateToken,
+    lndController.lndConnect
+)
+
 
 module.exports = router

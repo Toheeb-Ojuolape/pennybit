@@ -29,6 +29,7 @@ const connectRpc = async () => {
 const generatingInvoice = async (amount) => {
     try {
         const { lnRpcClient, routerClient } = await connectRpc()
+        console.log(amount)
         const invoice = await lnRpcClient.addInvoice({ value: amount.toString() })
         var invoiceData = {
             PaymentRequest: invoice.paymentRequest,
@@ -66,7 +67,8 @@ const invoiceLookUp = async (invoice) => {
     try {
         const { lnRpcClient, routerClient } = await connectRpc()
         const decoded = await decodeInvoice(invoice)
-        const lookUp = await lnRpcClient.lookupInvoice({ rHash: decoded.paymentHash })
+        const lookUp = await lnRpcClient.lookupInvoice({ rHashStr: decoded.paymentHash })
+        console.log(lookUp)
         return JSON.parse(JSON.stringify(lookUp))
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error)

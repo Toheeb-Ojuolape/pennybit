@@ -18,7 +18,7 @@ const generateQrCodeUrl = async (text) => {
     const url = await qr.toDataURL(text)
     return url
 }
-
+ 
 const uploadBase64ToCloudinary = async (text) => {
     try {
         const qrcodeUrl = await generateQrCodeUrl(text)

@@ -9,10 +9,10 @@ const nodeSchema = mongoose.Schema({
     },
     macaroon: {
         type: String,
-    },
+    }, 
     token: {
         type: String,
-    },
+    }, 
     pubkey: {
         type: String,
     },
