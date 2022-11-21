@@ -13,6 +13,23 @@ const login = {
   })
 }
 
+const lndLogin = {
+  body: Joi.object().keys({
+    host: Joi.string().required().messages({
+      "string.empty": `host cannot be an empty field`,
+      "any.required": `host is a required field`,
+    }),
+    cert: Joi.string().required().messages({
+      "string.empty": `cert cannot be an empty field`,
+      "any.required": `cert is a required field`,
+    }),
+    macaroon: Joi.string().required().messages({
+      "string.empty": `macaroon cannot be an empty field`,
+      "any.required": `macaroon is a required field`,
+    })
+  })
+}
+
 const confirmAccount = {
   body: Joi.object().keys({
     email: Joi.string().required().messages({
@@ -75,12 +92,38 @@ const updateUser = {
   })
 }
 
+const confirmLndInvoice = {
+  body: Joi.object().keys({
+    token: Joi.string().required().messages({
+      "string.empty": `token cannot be an empty field`,
+      "any.required": `token is a required field`,
+    }),
+    hash: Joi.string().required().messages({
+      "string.empty": `hash cannot be an empty field`,
+      "any.required": `hash is a required field`,
+    }),
+    amount: Joi.string().required().messages({
+      "string.empty": `amount cannot be an empty field`,
+      "any.required": `amount is a required field`,
+    })
+  })
+}
+
 const forgotPassword = {
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
       "string.empty": `Email cannot be an empty field`,
       "any.required": `Email is a required field`,
       "string.email": `You need to enter a valid email`,
+    }),
+  }),
+}
+
+const nodeInfo = {
+  body: Joi.object().keys({
+    token: Joi.string().required().messages({
+      "string.empty": `token cannot be an empty field`,
+      "any.required": `token is a required field`,
     }),
   }),
 }
@@ -112,6 +155,8 @@ const updatePassword = {
     }),
     oldPassword: Joi.string().required().messages({
       "string.empty": `Old Password cannot be an empty field`,
+      "string.min": `New Password should have a minimum length of {#limit}`,
+      "string.max": `New Password should have a maximum length of {#limit}`,
       "any.required": `Old Password is a required field`,
     }),
   }),
@@ -135,5 +180,8 @@ module.exports = {
   resetPassword,
   updatePassword,
   resendMail,
-  updateUser
+  updateUser,
+  lndLogin,
+  nodeInfo,
+  confirmLndInvoice
 }

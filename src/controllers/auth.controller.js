@@ -2,6 +2,7 @@ const ApiError = require("../helpers/ApiError")
 const catchAsync = require("../helpers/catchAsync")
 const pick = require("../helpers/pick")
 const sendMail = require("../helpers/mail")
+const qrToImage = require("../helpers/qrCode")
 
 const { authService, tokenService } = require("../services")
 
@@ -90,6 +91,7 @@ const forgotPassword = catchAsync(async (req, res) => {
     })
 })
 
+
 const resetPassword = catchAsync(async (req, res) => {
     await authService.resetPassword(req.body.token, req.body.newPassword)
     res.status(200).send({
@@ -151,9 +153,11 @@ module.exports = {
     emailVerification,
     resendTokens,
     forgotPassword,
+    getUser,
+    getUsers,
     resetPassword,
     updatePassword,
     updateUserById,
     getUser,
-    getUsers
+    getUsers,
 }
