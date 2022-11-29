@@ -2,6 +2,7 @@ const ApiError = require("../helpers/ApiError")
 const catchAsync = require("../helpers/catchAsync")
 const pick = require("../helpers/pick")
 const sendMail = require("../helpers/mail")
+const { User, Token } = require("../models")
 const qrToImage = require("../helpers/qrCode")
 
 const { authService, tokenService } = require("../services")
@@ -47,13 +48,21 @@ const login = catchAsync(async (req, res) => {
 })
 
 const resendTokens = catchAsync(async (req, res) => {
-    const tokens = await tokenService.generateResendTokens(req.user)
-    // Send email
-    res.status(201).send({
-        message: "Email sent successfully",
-        data: {
-            token: tokens.emailToken.token
-        }
+    const token = Math.floor(1000 + Math.random() * 9000)
+    const to = req.body.email
+    const template = "/templates/views/verification-code.html"
+    const subject = "Verify Your PennyBit Account"
+    const user = await User.findOne({ to })
+    if (!user) throw new ApiError(400, "Invalid email or password")
+    if (user.status === "Active") throw new ApiError(400, "This account is activated already")
+    await authService.updateUserById(user.id, { pin: token })
+    const data = {
+        "name": user.firstName,
+        "token": token
+    }
+    sendMail(to, template, subject, data)
+    res.status(200).send({
+        message: "Token resent successfully",
     })
 })
 
