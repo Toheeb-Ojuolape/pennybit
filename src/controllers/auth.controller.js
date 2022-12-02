@@ -13,7 +13,8 @@ const register = catchAsync(async (req, res) => {
     const token = Math.floor(1000 + Math.random() * 9000)
     var userRequest = {
         ...req.body,
-        pin: token.toString()
+        pin: token.toString(),
+        availableBalance: 0
     }
     const user = await authService.register(userRequest)
     const tokens = await tokenService.generateAuthTokens(user, true)

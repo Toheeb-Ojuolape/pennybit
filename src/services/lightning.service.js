@@ -1,13 +1,15 @@
 const ApiError = require("../helpers/ApiError")
 const transactionService = require("./transaction.service")
 const lnrpc = require("@radar/lnrpc")
+const axios = require('axios')
+const https = require('https')
+
+const host = process.env.LND_RPC_URL
+const macaroon = process.env.LND_MACAROON
+const cert = process.env.LND_RPC_PATH
 
 const connectRpc = async () => {
     try {
-        const host = process.env.LND_RPC_URL
-        const macaroon = process.env.LND_MACAROON
-        const cert = process.env.LND_RPC_PATH
-
         const lnRpcClient = await lnrpc.createLnRpc({
             server: host,
             cert: Buffer.from(cert, 'hex').toString('utf-8'),
@@ -130,11 +132,123 @@ const subscribeToInvoice = async (body) => {
             }
         })
     } catch (error) {
-        
+        throw new ApiError(error.code || 500, error.message || error)
+    }
+}
+
+// Voltage APIs
+const voltageMacaroon = process.env.VOLTAGE_MACAROON
+const invoiceKey = process.env.INVOICE_KEY
+
+let voltageInstance = axios.create({
+    httpsAgent: new https.Agent({
+        rejectUnauthorized: false
+      }),
+    headers: { 
+      "Grpc-Metadata-macaroon" : voltageMacaroon 
+    }
+})   
+
+const getInfo = async () => { 
+    try {
+        let res = await voltageInstance.get(`${process.env.BASE_URL}/v1/getinfo`)
+        return JSON.parse(JSON.stringify(res.data))
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)
+    }
+} 
+
+const PayVoltageInvoice = async (invoice) => {
+    const payInvoiceData = {
+        payment_request: invoice,
+        timeout_seconds: 300, 
+        fee_limit_sat: parseInt(process.env.FEE_LIMIT)
+    }
+    try {
+        let res = await voltageInstance.post(`${process.env.BASE_URL}/v2/router/send`, payInvoiceData)
+        return JSON.parse(JSON.stringify(res.data))
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)   
+    }
+}
+
+const CreateVoltageInvoice = async (amountInSats) => {
+    const createInvoiceData = {
+        value: amountInSats
+    }
+    try {
+        let res = await voltageInstance.post(`${process.env.BASE_URL}/v1/invoices`, createInvoiceData)
+        console.log(res.data)
+        return JSON.parse(JSON.stringify(res.data))
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)   
+    }
+}
+
+const voltageCheckSettlement = async (invoice) => {
+    try {
+        const buffer = Buffer.from(invoice, 'base64')
+        console.log(`Hex string of invoice is: ${buffer.toString('hex')}`)
+        let res = await voltageInstance.get(`${process.env.BASE_URL}/v1/invoice/${buffer.toString('hex')}`)
+        return JSON.parse(JSON.stringify(res.data))
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)
+    }
+}
+
+
+
+
+// LN Bits deal
+let reqInstance = axios.create({
+    headers: {
+      "X-Api-Key" : invoiceKey 
+    } 
+}) 
+
+const voltageGetInfo = async () => {
+    try {
+        let res = await reqInstance.get(`${process.env.LNBIT_URL}/api/v1/wallet`)
+        return res.data
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)
+    }
+}
+
+const voltagePayInvoice = async (invoice) => {
+    const payInvoiceData = {
+        out: true,
+        bolt11: invoice
+    }
+    try {
+        let res = await axios.get(`${process.env.LNBIT_URL}/api/v1/payments`, payInvoiceData, config)
+        return res
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)
+    }
+}
+
+const voltageCreateInvoice = async (amountInSats) => {
+    const createInvoiceData = {
+        out: false,
+        amount: amountInSats,
+        unit: "sat", 
+        memo: "",
+        webhook: process.env.BASE_URL,
+        internal: false
+    }
+    try {
+        let res = await reqInstance.post(`${process.env.LNBIT_URL}/api/v1/payments`, createInvoiceData)
+        return res.data
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)   
     }
 }
 
 module.exports = {
+    getInfo,
+    CreateVoltageInvoice,
+    PayVoltageInvoice,
     lookupInvoiceHash,
     subscribeToInvoice,
     getFeeReport,
@@ -144,5 +258,9 @@ module.exports = {
     connectRpc,
     decodeInvoice,
     payWithHash,
-    payWithInvoice
+    payWithInvoice,
+    voltageGetInfo,
+    voltagePayInvoice,
+    voltageCreateInvoice,
+    voltageCheckSettlement
 }

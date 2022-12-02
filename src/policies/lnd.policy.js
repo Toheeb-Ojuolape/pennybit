@@ -18,6 +18,15 @@ const lookUpInvoice = {
     })
 }
 
+const lookUpVoltageInvoice = {
+  body: Joi.object().keys({
+    rhash: Joi.string().required().messages({
+      "string.empty": `rhash cannot be an empty field`,
+      "any.required": `rhash is a required field`,
+    })
+  })
+}
+
 const createInvoice = {
     body: Joi.object().keys({
       amountInSats: Joi.required().messages({
@@ -30,5 +39,6 @@ const createInvoice = {
 module.exports = {
   lookUpHash,
   lookUpInvoice,
-  createInvoice
+  createInvoice,
+  lookUpVoltageInvoice
 }
