@@ -47,9 +47,8 @@ router.post(
     authController.updateUserById
 )
 
-router.get(
-    "/account/resend",
-    [authService.validateToken],
+router.post(
+    "/resend/token",
     authController.resendTokens
 )
 

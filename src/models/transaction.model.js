@@ -14,8 +14,7 @@ var transactionSchema = new schema({
     },
     transactionStatus: {
         type: String,
-        enum: ["INITIATED", "PROCESSING", "ABANDONED", "SUCCESS", "FAILED", "REVERSED", "CANCELLED"],
-        default: "INITIATED",
+        enum: ["INITIATED", "PROCESSING", "ABANDONED", "SUCCESS", "FAILED", "REVERSED", "CANCELLED"]
     },
     transactionType: {
         type: String,
@@ -26,14 +25,31 @@ var transactionSchema = new schema({
         required: true,
         trim: true
     },
-    amount: {
-        type: Number,
-        required: true
+    amountInSats: {
+        type: Number
+    },
+    verified: {
+        type: Boolean,
+        default: false
+    },
+    amountInBtc: {
+        type: Number
     },
     invoice: {
         type: String
     },
+    rhash: {
+        type: String
+    },
     transactionDate: {
+        type: String,
+        default: moment().format(),
+    },
+    createdAt: {
+        type: String,
+        default: moment().format(),
+      },
+      updatedAt: {
         type: String,
         default: moment().format(),
     }

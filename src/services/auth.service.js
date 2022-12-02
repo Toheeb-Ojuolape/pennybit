@@ -16,7 +16,6 @@ const register = async (data) => {
         }
         data.password = await bcrypt.hash(data.password, 10)
         const newUser = await User.create(data)
-        console.log(newUser)
         return JSON.parse(JSON.stringify(newUser))
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error)
@@ -117,9 +116,19 @@ const updateUserById = async (userId, updateBody) => {
     }
 }
 
+const updateUserBalance = async (userId, balance) => {
+    try {
+        let user = await User.findById(userId)
+        if (!user) throw new ApiError(400, "Invalid user")
+        user = await updateUserById(userId, { availableBalance: balance })
+        return user
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || "An error occured");
+    }
+}
+
 const emailVerification = async (data) => {
     try {
-        console.log("point one")
         let user = await User.findOne({ email: data.email, pin: data.pin })
         if (!user) throw new ApiError(400, "Invalid user")
         user = await updateUserById(user._id, { accountConfirmed: true, status: "Active" })
@@ -170,12 +179,13 @@ module.exports = {
     register,
     login,
     getUserByEmail,
+    updateUserById,
     getUserById,
     getUsers,
     validateToken,
-    updateUserById,
     emailVerification,
     resetPassword,
     updatePassword,
-    count
+    count,
+    updateUserBalance
 }
