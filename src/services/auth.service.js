@@ -118,7 +118,7 @@ const updateUserById = async (userId, updateBody) => {
 
 const updateUserBalance = async (userId, balance) => {
     try {
-        let user = await User.findOne({ email: data.email, pin: data.pin })
+        let user = await User.findById(userId)
         if (!user) throw new ApiError(400, "Invalid user")
         user = await updateUserById(userId, { availableBalance: balance })
         return user

@@ -123,7 +123,7 @@ const voltageCreateInvoice = catchAsync(async (req, res) => {
     const txnreq = {
         userId: req.user._id,
         narration: "Payment Received",
-        transactionType: "DEBIT",
+        transactionType: "CREDIT",
         amountInBtc: btcAmt,
         amountInSats,
         invoice: connection.payment_request,
@@ -137,29 +137,31 @@ const voltageCreateInvoice = catchAsync(async (req, res) => {
             user,
             connection,
             QR: qrCode
-        }
+        } 
     })
-})
+}) 
 
 const voltageLookupInvoice = catchAsync(async (req, res) => {
     const user = await authService.getUserById(req.user._id)
-    if(!user) throw new ApiError(400, "User not found")
+    if(!user) throw new ApiError(400, "User not found") 
     const { rhash } = req.body
+    const transaction = await transactionService.getSingleTxn({ rhash })
+    if(!transaction) throw new ApiError(400, "Transaction not found")
+    if(transaction.verified == true) throw new ApiError(400, "Transaction already validated")
     const lookup = await lightningService.voltageCheckSettlement(rhash)
     if(lookup.settled){
-        var transaction = await transactionService.findTransactions({ rhash })
         var newBalance = user.availableBalance + transaction.amountInSats
-        await transactionService.updateTransactionStatus(rhash, "SUCCESS");
+        await transactionService.updateTransactionStatus(transaction._id, "SUCCESS", true);
         await authService.updateUserBalance(req.user._id, newBalance);
     }
     else{
-        await transactionService.updateTransactionStatus(rhash, "ABANDONED");
+        await transactionService.updateTransactionStatus(transaction._id, "ABANDONED", false);
     }
     res.status(201).send({
         message: "Invoice lookup was successful",
         data: {
             lookup
-        }
+        } 
     })
 }) 
 

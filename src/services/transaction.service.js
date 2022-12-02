@@ -22,17 +22,7 @@ const createTransaction = async (body) => {
     }
 }
 
-const updateSingleTransaction = async (status, criteria) => {
-    try {
-        var transaction = await findOneTransaction(criteria)
-        if(!transaction) throw new ApiError(400, "Transaction with that reference does not exist")
-        await updateTransactionStatus({ transactionReference: txnRef }, status)
-    } catch (error) {
-        throw new ApiError(error.code || 500, error.message || error)
-    }
-}
-
-const findOneTransaction = async (ref) => {
+const findOneTransactionByRef = async (ref) => {
     try {
         const transaction = await Transaction.findOne({ ...ref })
         if(!transaction) throw new ApiError(400, "Transaction not found")
@@ -49,6 +39,16 @@ const findTransactions = async (criteria = {}) => {
         return JSON.parse(JSON.stringify(transactions))
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error);   
+    }
+}
+
+const getSingleTxn = async (criteria) => {
+    try {
+        const txn = await Transaction.findOne({ ...criteria })
+        if (!txn) throw new ApiError(400, "Invalid transaction")
+        return JSON.parse(JSON.stringify(txn))
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error);
     }
 }
 
@@ -71,46 +71,45 @@ const count = async = async (criteria = {}) => {
     return await Transaction.find(criteria).countDocuments()
 }
 
-const updateTransactionStatus = async (criteria, status) => {
-    const transaction = await Transaction.findOne({ ...criteria })
-    switch (status) {
-        case "INITIATED":
-            transaction.transactionStatus = status;
-            await transaction.save();
-            return transaction;
-        case "PROCESSING":
-            transaction.transactionStatus = status;
-            await transaction.save();
-            return transaction;
-        case "ABANDONED":
-            transaction.transactionStatus= status;
-            await transaction.save();
-            return transaction;
-        case "SUCCESS":
-            transaction.transactionStatus = status;
-            await transaction.save();
-            return transaction;
-        case "FAILED":
-            transaction.transactionStatus = status;
-            await transaction.save();
-            return transaction;
-        case "REVERSED":
-            transaction.transactionStatus = "REVERSED";
-            await transaction.save();
-            return transaction;
-        case "CANCELLED":
-            transaction.transactionStatus = "CANCELLED";
-            await transaction.save();
-            return transaction;
+const updateTxnById = async (txnId, updateBody) => {
+    try {
+        const transaction = await Transaction.findById(txnId)
+        Object.assign(transaction, updateBody)
+        await transaction.save()
+        return transaction
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error);
+    }
+}
+
+const updateSingleTransaction = async (status, criteria) => {
+    try {
+        var transaction = await findOneTransaction(criteria)
+        if(!transaction) throw new ApiError(400, "Transaction with that reference does not exist")
+        await updateTransactionStatus({ transactionReference: txnRef }, status)
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)
+    }
+}
+
+const updateTransactionStatus = async (txId, status, verified) => {
+    try {
+        let transaction = await Transaction.findById(txId)
+        if(transaction.verified) throw new ApiError(400, "Transaction already validated")
+        transaction = await updateTxnById(transaction._id, { transactionStatus: status, verified: verified })
+        return transaction
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error)
     }
 }
 
 module.exports = {
     count,
-    findOneTransaction,
+    findOneTransactionByRef,
     findTransactions,
     updateTransactionStatus,
     createTransaction,
     updateSingleTransaction,
-    fetchTransactions
+    fetchTransactions,
+    getSingleTxn
 }
