@@ -26,14 +26,29 @@ var transactionSchema = new schema({
         required: true,
         trim: true
     },
-    amount: {
+    amountInSats: {
+        type: Number,
+        required: true
+    },
+    amountInBtc: {
         type: Number,
         required: true
     },
     invoice: {
         type: String
     },
+    rhash: {
+        type: String
+    },
     transactionDate: {
+        type: String,
+        default: moment().format(),
+    },
+    createdAt: {
+        type: String,
+        default: moment().format(),
+      },
+      updatedAt: {
         type: String,
         default: moment().format(),
     }

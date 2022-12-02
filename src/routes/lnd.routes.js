@@ -20,19 +20,43 @@ router.post(
 router.post(
     "/invoicelookuphash",
     [validate(lndValidation.lookUpHash), authService.validateToken],
-    lndController.lookupInvoiceHash
+    lndController.lookupInvoiceHash 
 )
 
 router.post(
     "/payinvoice",
     [validate(lndValidation.createInvoice), authService.validateToken],
     lndController.payUserInvoice
-)
+) 
 
 router.post(
     "/lndconnect",
-    authService.validateToken,
+    authService.validateToken, 
     lndController.lndConnect
+)
+
+router.post(
+    "/voltageconnect",
+    authService.validateToken,
+    lndController.voltageLndConnect
+)
+
+router.post(
+    "/voltagegenerateinvoice",
+    [validate(lndValidation.createInvoice), authService.validateToken],
+    lndController.voltageCreateInvoice
+)
+
+router.post(
+    "/voltagepayinvoice",
+    [validate(lndValidation.lookUpInvoice), authService.validateToken],
+    lndController.voltagePayInvoice
+)
+
+router.post(
+    "/voltageinvoicelookup",
+    [validate(lndValidation.lookUpVoltageInvoice), authService.validateToken],
+    lndController.voltageLookupInvoice
 )
 
 

@@ -8,11 +8,13 @@ const createTransaction = async (body) => {
     try {
         const newTransaction = await Transaction.create({
             user: body.userId,
-            narration: "Transfer successful",
+            amountInSats: parseInt(body.amountInSats),
+            amountInBtc: parseInt(body.amountInBtc),
+            narration: body.narration,
             transactionType: body.transactionType,
-            amount: parseInt(body.amount),
             transactionReference: reference,
-            invoice: body.invoice
+            invoice: body.invoice,
+            rhash: body.rhash
         })
         return JSON.parse(JSON.stringify(newTransaction))
     } catch (error) {
@@ -24,7 +26,7 @@ const updateSingleTransaction = async (status, criteria) => {
     try {
         var transaction = await findOneTransaction(criteria)
         if(!transaction) throw new ApiError(400, "Transaction with that reference does not exist")
-        await updateTransaction({ transactionReference: txnRef }, status)
+        await updateTransactionStatus({ transactionReference: txnRef }, status)
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error)
     }
@@ -47,6 +49,21 @@ const findTransactions = async (criteria = {}) => {
         return JSON.parse(JSON.stringify(transactions))
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error);   
+    }
+}
+
+const fetchTransactions = async (criteria = {}, options = {}) => {
+    try {
+        const { sort = { createdAt: -1 }, limit, page } = options;
+        const _limit = parseInt(limit, 10)
+        const _page = parseInt(page, 10)
+        const transactions = await Transaction.find(criteria)
+        .sort(sort)
+        .limit(_limit)
+        .skip(_limit * (_page - 1))
+        return { transactions, page: _page }
+    } catch (error) {
+        throw new ApiError(error.code || 500, error.message || error);  
     }
 }
 
@@ -94,5 +111,6 @@ module.exports = {
     findTransactions,
     updateTransactionStatus,
     createTransaction,
-    updateSingleTransaction
+    updateSingleTransaction,
+    fetchTransactions
 }
