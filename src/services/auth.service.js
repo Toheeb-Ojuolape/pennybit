@@ -29,7 +29,7 @@ const login = async (email, password) => {
         if (!user.accountConfirmed) throw new ApiError(400, "Account not activated")
         if (!user.status) throw new ApiError(400, "Your account is not activated")
         await comparePassword(password, user)
-        return user
+        return user.populate('availableBalance')
     } catch (error) {
         throw new ApiError(error.code || 500, error.message || error)
     }

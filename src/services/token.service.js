@@ -158,7 +158,7 @@ const generateResendTokens = async (user) => {
 
 const generateResetPasswordToken = async (email) => {
     try {
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email }) 
         if(!user) throw new ApiError(404, "No user found with that email")
         const expires = moment().add(60, 'minutes')
         const resetPasswordToken = generateToken(user, expires)
