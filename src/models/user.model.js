@@ -36,7 +36,8 @@ const userSchema = new schema({
         trim: true,
     },
     availableBalance: {
-        type: Number
+        type: Number,
+        default: 0
     },
     gender: {
         type: String,
