@@ -41,3 +41,7 @@ export const SignUpSchema = Yup.object().shape({
     }
   }),
 });
+
+export const EmailSchema = Yup.object().shape({
+  email: Yup.string().email("Invalid email format").trim().required("Email is required"),
+});

@@ -3,6 +3,7 @@ import { baseQueryWithReauth, createRequest } from "./shared";
 
 export const authApi = createApi({
   reducerPath: "authApi",
+  tagTypes: ["auth"],
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     activateUser: builder.mutation({
@@ -35,16 +36,16 @@ export const authApi = createApi({
     forgotPassword: builder.mutation({
       query: (data) => {
         return {
-          url: `password/tokens`,
+          url: `user/forgot/password`,
           method: "post",
           body: data,
         };
       },
     }),
-    verifyForgotToken: builder.mutation({
+    resendToken: builder.mutation({
       query: (data) => {
         return {
-          url: `password/token/verify`,
+          url: `user/resend/token`,
           method: "post",
           body: data,
         };
@@ -53,11 +54,31 @@ export const authApi = createApi({
     resetPassword: builder.mutation({
       query: (data) => {
         return {
-          url: `password/reset`,
+          url: `user/reset/password`,
           method: "post",
           body: data,
         };
       },
+    }),
+
+    getProfile: builder.query({
+      query: () => createRequest(`user/getone`),
+      transformResponse: (response) => {
+        return response.data?.user;
+      },
+
+      providesTags: (result, _error, _arg) => (result?.data ? [{ type: "auth", id: result?.data?.id }] : [{ type: "auth", id: "current" }]),
+    }),
+
+    updateUserMutation: builder.mutation({
+      query: (data) => {
+        return {
+          url: `user/update`,
+          method: "post",
+          body: data,
+        };
+      },
+      invalidatesTags: (result, _error, _arg) => [{ type: "auth", id: result?.data?.id }],
     }),
 
     logoutUser: builder.query({
@@ -74,4 +95,7 @@ export const {
   useVerifyForgotTokenMutation,
   useResetPasswordMutation,
   useRegisterUserMutation,
+  useResendTokenMutation,
+  useUpdateUserMutationMutation,
+  useGetProfileQuery,
 } = authApi;

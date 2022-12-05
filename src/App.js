@@ -41,7 +41,7 @@ const App = () => {
           <Route path="/generatepayment" element={<GeneratePayment />} />
           <Route path="/paymentlink" element={<PaymentLink />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<NewPassword />} />
+          <Route path="/reset-password/:token" element={<NewPassword />} />
           <Route path="/confirm-email" element={<ConfirmEmail />} />
           <Route path="/verification" element={<Verification />} />
         </Routes>

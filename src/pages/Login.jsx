@@ -15,6 +15,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [login, { data, isLoading, isSuccess, isError, error }] = useLoginUserMutation();
   const dispatch = useDispatch();
+  const formRef = React.useRef(null);
 
   const handleSubmit = (values) => {
     login(values);
@@ -27,12 +28,16 @@ const Login = () => {
     }
     if (isError && error && "status" in error) {
       toast.error(error?.data?.message);
+      if (error?.data?.message === "Account not activated") {
+        localStorage.setItem("email", JSON.stringify(formRef.current.values.email));
+        navigate("/confirm-email");
+      }
     }
   }, [data, isLoading, isSuccess, isError, error, navigate, dispatch]);
 
   return (
     <AuthScreen title={"Welcome Back"} subtitle={"Time to make some money moves!"}>
-      <Formik onSubmit={handleSubmit} validationSchema={SignInSchema} initialValues={initialSignInValues}>
+      <Formik onSubmit={handleSubmit} innerRef={formRef} validationSchema={SignInSchema} initialValues={initialSignInValues}>
         {({ values, setFieldTouched, isValid, handleSubmit, errors }) => (
           <>
             <InputField
@@ -52,7 +57,9 @@ const Login = () => {
               name="password"
               setFieldTouched={setFieldTouched}
             />
-            <p className="text-xs text-black font-medium cursor-pointer text-end mb-6">Forgot Password?</p>
+            <p onClick={() => navigate("/forgot-password")} className="text-xs text-black font-medium cursor-pointer text-end mb-6">
+              Forgot Password?
+            </p>
             <Button disabled={!isValid || !values?.email} onClick={handleSubmit} loader={isLoading}>
               Log in
             </Button>

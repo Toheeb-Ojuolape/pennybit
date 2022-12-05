@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import OTPInput from "../components/OTPInput/Index";
 import AuthScreen from "../HOC/AuthScreen";
-import { useActivateUserMutation } from "../redux/services";
+import { useActivateUserMutation, useResendTokenMutation } from "../redux/services";
 import Button from "./Button";
 
 const ConfirmOTP = ({ title }) => {
@@ -12,15 +12,29 @@ const ConfirmOTP = ({ title }) => {
   const email = JSON.parse(localStorage.getItem("email"));
   const navigate = useNavigate();
   const [verifyUser, { isLoading, isSuccess, isError, error }] = useActivateUserMutation();
+  const [resendOtp, { isLoading: resendLoading, isSuccess: resendSuccess, isError: isResendError, error: resendError }] = useResendTokenMutation();
   const dispatch = useDispatch();
 
   const handleSubmit = () => {
     verifyUser({ pin: otp, email });
   };
 
+  const handleResendToken = () => {
+    resendOtp({ email });
+  };
+  useEffect(() => {
+    if (resendSuccess) {
+      toast.success("Token resent successfully");
+    }
+    if (isResendError && resendError && "status" in resendError) {
+      toast.error(resendError?.data?.message);
+    }
+  }, [resendSuccess, isResendError, resendError, resendLoading]);
+
   useEffect(() => {
     if (isSuccess) {
       dispatch({ type: "LOGOUT" });
+      localStorage.clear();
       navigate("/");
     }
     if (isError && error && "status" in error) {
@@ -34,19 +48,22 @@ const ConfirmOTP = ({ title }) => {
         <OTPInput
           autoFocus
           isNumberInput
-          length={5}
+          length={4}
           className="my-[1.46rem] flex items-center  justify-center"
           inputClassName="border-2 text-[0.78125rem] md:py-2 font-normal outline-none text-center w-[1.7335rem]  md:w-[3.3335rem] text-2xl md:text-4xl mr-[0.83rem]"
           onChangeOTP={(otp) => setOtp(otp)}
         />
       </div>
-      <Button disabled={otp.length !== 5} onClick={handleSubmit} loader={isLoading}>
+      <Button disabled={otp.length !== 4} onClick={handleSubmit} loader={isLoading || resendLoading}>
         Confirm Code
       </Button>
       <div>
         <p className="text-base text-center mt-4">
           Didn’t receive an OTP?
-          <span className="underline cursor-pointer"> Resend OTP</span>
+          <span className="underline cursor-pointer" onClick={handleResendToken}>
+            {" "}
+            Resend OTP
+          </span>
         </p>
       </div>
     </AuthScreen>

@@ -37,8 +37,9 @@ const Register = () => {
 
   useEffect(() => {
     if (isSuccess) {
+      toast.success("Token sent successfully");
       JSON.stringify(localStorage.setItem("email", JSON.stringify(data?.data?.user?.email)));
-      navigate("/verification");
+      navigate("/confirm-email");
     }
     if (isError && error && "status" in error) {
       toast.error(error?.data?.message);
